@@ -1,193 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FUTLOCO 1v1 - Online</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap');
+
+        :root {
+            --green-dark: #1a5c1a;
+            --green-light: #1e6b1e;
+            --yellow: #f5d000;
+            --white: #ffffff;
+        }
+
+        body {
+            margin: 0; background: #0f0f0f; color: white;
+            font-family: 'Montserrat', sans-serif; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* LOBBY LAYOUT */
+        #lobby {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; height: 100vh; gap: 20px;
+        }
+
+        .card {
+            background: #1a1a1a; padding: 30px; border-radius: 15px;
+            border: 1px solid #333; width: 350px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h1 { font-family: 'Bebas Neue'; font-size: 5rem; color: var(--yellow); margin: 0; }
+        
+        input {
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px;
+            border: none; background: #222; color: white; font-size: 1rem;
+        }
+
+        .btn {
+            width: 100%; padding: 15px; border-radius: 8px; border: none;
+            background: var(--yellow); color: black; font-weight: bold;
+            cursor: pointer; font-size: 1.1rem; transition: 0.3s;
+        }
+        .btn:hover { transform: scale(1.03); opacity: 0.9; }
+
+        /* GAME LAYOUT */
+        #game-ui { display: none; flex-direction: column; align-items: center; margin-top: 20px; }
+        
+        .scoreboard {
+            background: rgba(0,0,0,0.8); padding: 10px 40px; border-radius: 50px;
+            display: flex; gap: 30px; align-items: center; border: 2px solid #333;
+            margin-bottom: 15px; font-family: 'Bebas Neue'; font-size: 2rem;
+        }
+
+        #canvas-container {
+            position: relative; border: 6px solid #333; border-radius: 10px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        #goal-alert {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-family: 'Bebas Neue'; font-size: 8rem; color: var(--yellow);
+            display: none; text-shadow: 0 0 20px black; z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+<div id="lobby">
+    <h1>FUTLOCO</h1>
+    
+    <div id="step-1" class="card">
+        <input type="text" id="name-in" placeholder="SEU NOME" maxlength="10">
+        <button class="btn" onclick="goToStep2()">PRÓXIMO</button>
+    </div>
+
+    <div id="step-2" class="card" style="display:none">
+        <button class="btn" id="btn-create">CRIAR SALA</button>
+        <p>OU</p>
+        <input type="text" id="code-in" placeholder="CÓDIGO">
+        <button class="btn" id="btn-join" style="background:#444; color:white">ENTRAR</button>
+    </div>
+
+    <div id="step-wait" class="card" style="display:none">
+        <p>CÓDIGO DA SALA:</p>
+        <h2 id="room-display" style="font-size:3rem; color:var(--yellow)">----</h2>
+        <p>Aguardando oponente...</p>
+    </div>
+</div>
+
+<div id="game-ui">
+    <div class="scoreboard">
+        <span id="p1-name-ui">P1</span>
+        <span id="score-ui" style="color:var(--yellow)">0 - 0</span>
+        <span id="p2-name-ui">P2</span>
+        <span id="time-ui" style="font-size:1.2rem; margin-left:20px; color:#aaa">03:00</span>
+    </div>
+    <div id="canvas-container">
+        <div id="goal-alert">GOOOOL!</div>
+        <canvas id="field"></canvas>
+    </div>
+</div>
+
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA2errhulZq6uaSnu9ax4jzIqpKvKX8phA",
-  authDomain: "futebol-7df3e.firebaseapp.com",
-  databaseURL: "https://futebol-7df3e-default-rtdb.firebaseio.com",
-  projectId: "futebol-7df3e",
-  storageBucket: "futebol-7df3e.firebasestorage.app",
-  messagingSenderId: "705698542572",
-  appId: "1:705698542572:web:3460d33b213c8a366ac6c9"
+    apiKey: "AIzaSyA2errhulZq6uaSnu9ax4jzIqpKvKX8phA",
+    authDomain: "futebol-7df3e.firebaseapp.com",
+    databaseURL: "https://futebol-7df3e-default-rtdb.firebaseio.com",
+    projectId: "futebol-7df3e",
+    storageBucket: "futebol-7df3e.firebasestorage.app",
+    messagingSenderId: "705698542572",
+    appId: "1:705698542572:web:3460d33b213c8a366ac6c9"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const CANVAS_W = 780, CANVAS_H = 440;
-let myRole = null, roomCode = '', myName = '', myColor = '#e84040';
+// CONFIGURAÇÕES TÉCNICAS
+const CW = 800, CH = 450, FPS = 60;
+const GOAL_SIZE = 120;
+const canvas = document.getElementById('field');
+const ctx = canvas.getContext('2d');
+canvas.width = CW; canvas.height = CH;
 
-// Estado do Jogo (O que sincroniza)
-const phys = {
-  p1: { x: 150, y: 220, vx: 0, vy: 0, r: 20, score: 0, name: '', color: '#e84040' },
-  p2: { x: 630, y: 220, vx: 0, vy: 0, r: 20, score: 0, name: '', color: '#3a6fe8' },
-  ball: { x: 390, y: 220, vx: 0, vy: 0, r: 12 },
-  time: 180,
-  phase: 'playing'
+let myRole = null; // 'p1' ou 'p2'
+let roomCode = '';
+let myName = '';
+const keys = {};
+
+// ESTADO DO JOGO
+const state = {
+    p1: { x: 100, y: CH/2, r: 20, score: 0, color: '#e84040', name: 'P1' },
+    p2: { x: 700, y: CH/2, r: 20, score: 0, color: '#3a6fe8', name: 'P2' },
+    ball: { x: CW/2, y: CH/2, r: 10, vx: 0, vy: 0 },
+    time: 180,
+    isGoal: false
 };
 
-const keys = {};
-const p1Input = { up: false, down: false, left: false, right: false, sprint: false };
-const p2Input = { up: false, down: false, left: false, right: false, sprint: false };
+// INPUTS REMOTOS
+const inputs = {
+    p1: { up: false, down: false, left: false, right: false, sprint: false },
+    p2: { up: false, down: false, left: false, right: false, sprint: false }
+};
 
-let canvas, ctx;
-const FPS = 60;
-const step = 1 / FPS;
+// --- LÓGICA DE NAVEGAÇÃO ---
+window.goToStep2 = () => {
+    myName = document.getElementById('name-in').value || "JOGADOR";
+    document.getElementById('step-1').style.display = 'none';
+    document.getElementById('step-2').style.display = 'block';
+};
 
-// --- FÍSICA (APENAS P1 PROCESSA) ---
-function updatePhysics() {
-  if (myRole !== 'p1') return; // Segurança: só o dono da sala calcula
-
-  const move = (p, input) => {
-    const speed = input.sprint ? 7 : 4;
-    if (input.up) p.vy -= 1;
-    if (input.down) p.vy += 1;
-    if (input.left) p.vx -= 1;
-    if (input.right) p.vx += 1;
-
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vx *= 0.85; // Atrito
-    p.vy *= 0.85;
-
-    // Limites de campo
-    p.x = Math.max(p.r, Math.min(CANVAS_W - p.r, p.x));
-    p.y = Math.max(p.r, Math.min(CANVAS_H - p.r, p.y));
-  };
-
-  move(phys.p1, p1Input);
-  move(phys.p2, p2Input);
-
-  // Bola
-  phys.ball.x += phys.ball.vx;
-  phys.ball.y += phys.ball.vy;
-  phys.ball.vx *= 0.98;
-  phys.ball.vy *= 0.98;
-
-  // Colisão Bola com Jogadores
-  [phys.p1, phys.p2].forEach(p => {
-    const dx = phys.ball.x - p.x;
-    const dy = phys.ball.y - p.y;
-    const dist = Math.hypot(dx, dy);
-    if (dist < p.r + phys.ball.r) {
-      const angle = Math.atan2(dy, dx);
-      const power = p.sprint ? 12 : 8;
-      phys.ball.vx = Math.cos(angle) * power;
-      phys.ball.vy = Math.sin(angle) * power;
-    }
-  });
-
-  // Paredes e Gols
-  const goalY = (CANVAS_H - 120) / 2;
-  if (phys.ball.y < phys.ball.r || phys.ball.y > CANVAS_H - phys.ball.r) phys.ball.vy *= -1;
-  
-  if (phys.ball.x < phys.ball.r || phys.ball.x > CANVAS_W - phys.ball.r) {
-    if (phys.ball.y > goalY && phys.ball.y < goalY + 120) {
-      // GOL!
-      if (phys.ball.x < CANVAS_W / 2) phys.p2.score++; else phys.p1.score++;
-      resetBall();
-    } else {
-      phys.ball.vx *= -1;
-    }
-  }
-
-  phys.time -= step;
-  broadcastState();
-}
-
-function resetBall() {
-  phys.ball = { x: 390, y: 220, vx: 0, vy: 0, r: 12 };
-  phys.p1.x = 150; phys.p1.y = 220;
-  phys.p2.x = 630; phys.p2.y = 220;
-}
-
-// --- NETCODE ---
-function broadcastState() {
-  set(ref(db, `futloco/${roomCode}/state`), phys);
-}
-
-function sendInput() {
-  const myInput = {
-    up: keys['KeyW'] || keys['ArrowUp'],
-    down: keys['KeyS'] || keys['ArrowDown'],
-    left: keys['KeyA'] || keys['ArrowLeft'],
-    right: keys['KeyD'] || keys['ArrowRight'],
-    sprint: keys['ShiftLeft'] || keys['ShiftRight']
-  };
-  update(ref(db, `futloco/${roomCode}/${myRole}Input`), myInput);
-}
-
-// --- LOOP PRINCIPAL ---
-function gameLoop() {
-  if (phys.phase === 'playing') {
-    updatePhysics();
-    sendInput();
-  }
-  draw();
-  updateSB();
-  setTimeout(() => requestAnimationFrame(gameLoop), 1000 / FPS);
-}
-
-// --- FUNÇÕES DE INTERFACE (COLE NO SEU CÓDIGO) ---
-function draw() {
-  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-  // Gramado simples
-  ctx.fillStyle = '#1e6b1e'; ctx.fillRect(0,0,CANVAS_W, CANVAS_H);
-  // Jogadores
-  [phys.p1, phys.p2].forEach(p => {
-    ctx.fillStyle = p.color; ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
-  });
-  // Bola
-  ctx.fillStyle = '#fff'; ctx.beginPath();
-  ctx.arc(phys.ball.x, phys.ball.y, phys.ball.r, 0, Math.PI*2); ctx.fill();
-}
-
-function updateSB() {
-  document.getElementById('sb-score').textContent = `${phys.p1.score} — ${phys.p2.score}`;
-  document.getElementById('sb-time').textContent = Math.ceil(phys.time);
-}
-
-// Lógica de botões (Create/Join)
 document.getElementById('btn-create').onclick = async () => {
-  roomCode = Math.random().toString(36).slice(2,6).toUpperCase();
-  myRole = 'p1';
-  phys.p1.name = myName;
-  await set(ref(db, `futloco/${roomCode}`), { state: phys, p1Input, p2Input });
-  
-  onValue(ref(db, `futloco/${roomCode}/p2Input`), s => { if(s.val()) Object.assign(p2Input, s.val()); });
-  onValue(ref(db, `futloco/${roomCode}/p1Input`), s => { if(s.val()) Object.assign(p1Input, s.val()); });
-  
-  document.getElementById('wait-card').style.display = 'block';
-  document.getElementById('disp-code').textContent = roomCode;
-  
-  // Esperar P2 entrar
-  onValue(ref(db, `futloco/${roomCode}/p2Name`), s => { if(s.val()) startGame(); });
+    roomCode = Math.random().toString(36).slice(2,6).toUpperCase();
+    myRole = 'p1';
+    state.p1.name = myName;
+    
+    await set(ref(db, `futloco/${roomCode}`), { state, inputs });
+    document.getElementById('step-2').style.display = 'none';
+    document.getElementById('step-wait').style.display = 'block';
+    document.getElementById('room-display').textContent = roomCode;
+
+    // Escutar quando P2 entra
+    onValue(ref(db, `futloco/${roomCode}/state/p2/name`), (s) => {
+        if(s.val() && s.val() !== 'P2') initGame();
+    });
+
+    // Escutar inputs do P2
+    onValue(ref(db, `futloco/${roomCode}/inputs/p2`), (s) => {
+        if(s.val()) inputs.p2 = s.val();
+    });
 };
 
 document.getElementById('btn-join').onclick = async () => {
-  roomCode = document.getElementById('inp-code').value.toUpperCase();
-  myRole = 'p2';
-  await set(ref(db, `futloco/${roomCode}/p2Name`), myName);
-  
-  onValue(ref(db, `futloco/${roomCode}/state`), s => { if(s.val()) Object.assign(phys, s.val()); });
-  startGame();
+    roomCode = document.getElementById('code-in').value.toUpperCase();
+    if(!roomCode) return;
+    myRole = 'p2';
+    
+    await update(ref(db, `futloco/${roomCode}/state/p2`), { name: myName });
+    
+    // Escutar estado do servidor (P1)
+    onValue(ref(db, `futloco/${roomCode}/state`), (s) => {
+        if(s.val()) Object.assign(state, s.val());
+    });
+
+    // Escutar inputs do P1
+    onValue(ref(db, `futloco/${roomCode}/inputs/p1`), (s) => {
+        if(s.val()) inputs.p1 = s.val();
+    });
+
+    initGame();
 };
 
-function startGame() {
-  document.getElementById('lobby').style.display = 'none';
-  document.getElementById('game').style.display = 'flex';
-  canvas = document.getElementById('gc');
-  canvas.width = CANVAS_W; canvas.height = CANVAS_H;
-  ctx = canvas.getContext('2d');
-  window.addEventListener('keydown', e => keys[e.code] = true);
-  window.addEventListener('keyup', e => keys[e.code] = false);
-  gameLoop();
+// --- CORE DO JOGO ---
+function initGame() {
+    document.getElementById('lobby').style.display = 'none';
+    document.getElementById('game-ui').style.display = 'flex';
+    document.getElementById('p1-name-ui').textContent = state.p1.name;
+    document.getElementById('p2-name-ui').textContent = state.p2.name;
+
+    window.addEventListener('keydown', e => keys[e.code] = true);
+    window.addEventListener('keyup', e => keys[e.code] = false);
+
+    setInterval(loop, 1000 / FPS);
 }
 
-// Lógica de perfil inicial
-document.getElementById('btn-play').onclick = () => {
-  myName = document.getElementById('inp-name').value || "JOGADOR";
-  document.getElementById('config-card').style.display = 'none';
-  document.getElementById('cj-card').style.display = 'block';
-};
+function loop() {
+    updateInputs();
+    if (myRole === 'p1') {
+        processPhysics();
+        set(ref(db, `futloco/${roomCode}/state`), state);
+    }
+    draw();
+}
+
+function updateInputs() {
+    const myIn = {
+        up: keys['KeyW'] || keys['ArrowUp'],
+        down: keys['KeyS'] || keys['ArrowDown'],
+        left: keys['KeyA'] || keys['ArrowLeft'],
+        right: keys['KeyD'] || keys['ArrowRight'],
+        sprint: keys['ShiftLeft'] || keys['ShiftRight']
+    };
+    update(ref(db, `futloco/${roomCode}/inputs/${myRole}`), myIn);
+    if(myRole === 'p1') inputs.p1 = myIn; else inputs.p2 = myIn;
+}
+
+function processPhysics() {
+    if(state.isGoal) return;
+
+    const move = (p, inv) => {
+        const speed = inv.sprint ? 6 : 3.5;
+        if(inv.up) p.y -= speed;
+        if(inv.down) p.y += speed;
+        if(inv.left) p.x -= speed;
+        if(inv.right) p.x += speed;
+
+        p.x = Math.max(p.r, Math.min(CW - p.r, p.x));
+        p.y = Math.max(p.r, Math.min(CH - p.r, p.y));
+    };
+
+    move(state.p1, inputs.p1);
+    move(state.p2, inputs.p2);
+
+    // BOLA MOVIMENTO
+    state.ball.x += state.ball.vx;
+    state.ball.y += state.ball.vy;
+    state.ball.vx *= 0.98;
+    state.ball.vy *= 0.98;
+
+    // COLISÃO PAREDES (BOLA)
+    const goalTop = (CH - GOAL_SIZE)/2;
+    const goalBottom = goalTop + GOAL_SIZE;
+
+    // Rebote Cima/Baixo
+    if(state.ball.y < state.ball.r || state.ball.y > CH - state.ball.r) state.ball.vy *= -1;
+
+    // Rebote Laterais (se não for gol)
+    if(state.ball.x < state.ball.r || state.ball.x > CW - state.ball.r) {
+        if(state.ball.y > goalTop && state.ball.y < goalBottom) {
+            handleGoal(state.ball.x < CW/2 ? 'p2' : 'p1');
+        } else {
+            state.ball.vx *= -1;
+            state.ball.x = state.ball.x < CW/2 ? state.ball.r : CW - state.ball.r;
+        }
+    }
+
+    // COLISÃO JOGADOR VS BOLA
+    [state.p1, state.p2].forEach(p => {
+        const dx = state.ball.x - p.x;
+        const dy = state.ball.y - p.y;
+        const dist = Math.hypot(dx, dy);
+        if(dist < p.r + state.ball.r) {
+            const angle = Math.atan2(dy, dx);
+            const force = 10;
+            state.ball.vx = Math.cos(angle) * force;
+            state.ball.vy = Math.sin(angle) * force;
+        }
+    });
+
+    state.time = Math.max(0, state.time - 1/FPS);
+}
+
+function handleGoal(winner) {
+    state[winner].score++;
+    state.isGoal = true;
+    setTimeout(() => {
+        state.ball = { x: CW/2, y: CH/2, vx: 0, vy: 0, r: 10 };
+        state.p1.x = 100; state.p1.y = CH/2;
+        state.p2.x = 700; state.p2.y = CH/2;
+        state.isGoal = false;
+    }, 2000);
+}
+
+// --- DESENHO ---
+function draw() {
+    // 1. Gramado com textura (listras)
+    for(let i=0; i<10; i++) {
+        ctx.fillStyle = i % 2 === 0 ? '#1e6b1e' : '#1a5c1a';
+        ctx.fillRect(i * (CW/10), 0, CW/10, CH);
+    }
+
+    // 2. Linhas de campo
+    ctx.strokeStyle = "rgba(255,255,255,0.3)";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(5, 5, CW-10, CH-10);
+    ctx.beginPath(); ctx.moveTo(CW/2, 0); ctx.lineTo(CW/2, CH); ctx.stroke();
+    ctx.beginPath(); ctx.arc(CW/2, CH/2, 50, 0, Math.PI*2); ctx.stroke();
+
+    // 3. Gols (Textura de rede)
+    const drawGoal = (x, side) => {
+        ctx.fillStyle = "#333";
+        ctx.fillRect(x, (CH-GOAL_SIZE)/2, side * 15, GOAL_SIZE);
+        ctx.strokeStyle = "white"; ctx.lineWidth = 1;
+        for(let i=0; i<GOAL_SIZE; i+=10) {
+            ctx.beginPath(); ctx.moveTo(x, (CH-GOAL_SIZE)/2 + i); ctx.lineTo(x + side*15, (CH-GOAL_SIZE)/2 + i); ctx.stroke();
+        }
+    };
+    drawGoal(0, 1); drawGoal(CW-15, -1);
+
+    // 4. Jogadores
+    [state.p1, state.p2].forEach(p => {
+        ctx.shadowBlur = 15; ctx.shadowColor = p.color;
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0;
+    });
+
+    // 5. Bola
+    ctx.fillStyle = "white";
+    ctx.beginPath(); ctx.arc(state.ball.x, state.ball.y, state.ball.r, 0, Math.PI*2); ctx.fill();
+
+    // UI Updates
+    document.getElementById('score-ui').textContent = `${state.p1.score} - ${state.p2.score}`;
+    const m = Math.floor(state.time / 60), s = Math.floor(state.time % 60);
+    document.getElementById('time-ui').textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+    document.getElementById('goal-alert').style.display = state.isGoal ? 'block' : 'none';
+}
+
+</script>
+</body>
+</html>
