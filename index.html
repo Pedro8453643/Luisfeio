@@ -26,7 +26,6 @@ body {
   user-select: none;
 }
 
-/* LOBBY */
 #lobby {
   display: flex;
   flex-direction: column;
@@ -53,42 +52,6 @@ body {
   box-shadow: 0 15px 40px rgba(0,0,0,0.7);
 }
 
-.card-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.7rem;
-  letter-spacing: 0.15em;
-  color: #ccc;
-  margin-bottom: 1.6rem;
-  text-align: center;
-}
-
-.field-group label {
-  display: block;
-  font-size: 0.95rem;
-  color: #aaa;
-  margin-bottom: 0.5rem;
-}
-.field-group input {
-  width: 100%;
-  background: #111;
-  border: 2px solid #444;
-  border-radius: 10px;
-  color: white;
-  font-size: 1.45rem;
-  padding: 0.85rem 1rem;
-}
-.field-group input:focus { border-color: var(--yellow); }
-
-.color-pick { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 0.5rem; }
-.color-swatch {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  cursor: pointer;
-  transition: all .25s;
-}
-.color-swatch.active, .color-swatch:hover { transform: scale(1.3); border-color: #fff; }
-
 .btn {
   width: 100%;
   background: linear-gradient(90deg, var(--yellow), #ffed4d);
@@ -104,7 +67,6 @@ body {
 }
 .btn:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(245,208,0,0.5); }
 
-/* GAME */
 #game { display: none; flex-direction: column; align-items: center; width: 100vw; }
 
 .scoreboard {
@@ -117,109 +79,41 @@ body {
   align-items: center;
 }
 
-.sb-score {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 3.5rem;
-  color: var(--yellow);
-}
+.sb-score { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; color: var(--yellow); }
 
-#canvas-wrap {
-  position: relative;
-  width: min(780px, 98vw);
-  box-shadow: 0 0 50px rgba(0,0,0,0.85);
-}
-
-canvas#gc {
-  display: block;
-  width: 100%;
-  background: var(--grass);
-  border: 5px solid #111;
-  border-radius: 10px;
-}
+#canvas-wrap { position: relative; width: min(780px, 98vw); box-shadow: 0 0 50px rgba(0,0,0,0.85); }
+canvas#gc { display: block; width: 100%; background: var(--grass); border: 5px solid #111; border-radius: 10px; }
 
 #boost-indicator {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(245,208,0,0.95);
-  color: #111;
-  padding: 6px 24px;
-  border-radius: 30px;
-  font-weight: bold;
-  display: none;
-  z-index: 100;
+  position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(245,208,0,0.95); color: #111; padding: 6px 24px;
+  border-radius: 30px; font-weight: bold; display: none; z-index: 100;
 }
 
-/* ANIMAÇÃO DE GOL MELHORADA */
 #goal-overlay {
-  position: absolute;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  background: rgba(0,0,0,0.78);
-  z-index: 60;
+  position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+  flex-direction: column; background: rgba(0,0,0,0.78); z-index: 60;
   animation: goalPop 0.5s ease forwards;
 }
-@keyframes goalPop {
-  0% { transform: scale(0.3) rotate(-12deg); opacity: 0; }
-  50% { transform: scale(1.2) rotate(6deg); }
-  100% { transform: scale(1) rotate(0); opacity: 1; }
-}
-.goal-text {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 6.8rem;
-  color: var(--yellow);
-  text-shadow: 0 0 60px rgba(245,208,0,0.95), 6px 6px 0 #000;
-  animation: goalShake 0.4s ease infinite alternate;
-}
-@keyframes goalShake {
-  from { transform: translateX(-8px); }
-  to { transform: translateX(8px); }
-}
-#goal-scorer {
-  font-size: 2.1rem;
-  color: #ddd;
-  margin-top: 15px;
-  letter-spacing: 0.15em;
-}
+@keyframes goalPop { 0% { transform: scale(0.3) rotate(-12deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+.goal-text { font-family: 'Bebas Neue', sans-serif; font-size: 6.8rem; color: var(--yellow); text-shadow: 0 0 60px rgba(245,208,0,0.95); animation: goalShake 0.4s infinite alternate; }
+@keyframes goalShake { from { transform: translateX(-8px); } to { transform: translateX(8px); } }
 
-/* RESULT */
 #result-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.96);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 1.5rem;
-  z-index: 200;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.96); display: none;
+  align-items: center; justify-content: center; flex-direction: column; gap: 1.5rem; z-index: 200;
 }
-.result-btn {
-  background: var(--yellow);
-  color: #111;
-  border: none;
-  border-radius: 12px;
-  padding: 1rem 3.5rem;
-  font-size: 1.7rem;
-  cursor: pointer;
-}
+.result-btn { background: var(--yellow); color: #111; border: none; border-radius: 12px; padding: 1rem 3.5rem; font-size: 1.7rem; cursor: pointer; }
 </style>
 </head>
 <body>
 
 <div id="lobby">
-  <div class="logo-wrap">
-    <h1>FUTLOCO</h1>
-    <p style="font-size:1.3rem;color:#aaa;letter-spacing:0.3em;">FUTEBOL 1V1 ONLINE</p>
-  </div>
+  <div class="logo-wrap"><h1>FUTLOCO</h1><p style="font-size:1.3rem;color:#aaa;letter-spacing:0.3em;">FUTEBOL 1V1 ONLINE</p></div>
 
   <div class="card" id="config-card">
     <p class="card-title">// SEU PERFIL</p>
-    <div class="field-group">
+    <div class="field-group" style="margin-bottom:1.5rem">
       <label>APELIDO</label>
       <input type="text" id="inp-name" placeholder="RONALDO" maxlength="12" value="JOGADOR">
     </div>
@@ -274,8 +168,8 @@ canvas#gc {
   </div>
 
   <div style="width:min(780px,98vw);padding:0.8rem 1.5rem;background:#111;color:#777;font-size:1.05rem;display:flex;justify-content:space-between;">
-    <span>WASD + ESPAÇO + SHIFT (sprint)</span>
-    <span>SETAS + ENTER + SHIFT (sprint)</span>
+    <span>WASD + ESPAÇO + SHIFT</span>
+    <span>SETAS + ENTER + SHIFT</span>
   </div>
 </div>
 
@@ -315,18 +209,16 @@ const phys = {
 
 const myInput = { left:false, right:false, up:false, down:false, kick:false, sprint:false };
 
-let canvas, ctx, lastTs = 0, broadcastTimer = 0;
+let canvas, ctx, lastTs = 0, lastBroadcast = 0;
 
-// ==================== FÍSICA AJUSTADA (menos tremida) ====================
-const BASE_SPEED = 270;
-const SPRINT_SPEED = 480;
-const FRICTION = 0.83;           // aumentado para mais estabilidade
-const BALL_FRICTION = 0.978;
-const KICK_FORCE = 530;
+// Física mais estável
+const BASE_SPEED = 275;
+const SPRINT_SPEED = 485;
+const PLAYER_FRICTION = 0.84;
+const BALL_FRICTION = 0.979;
+const KICK_FORCE = 540;
 const GOAL_W = 14, GOAL_H = 120, GOAL_Y = (CANVAS_H - GOAL_H)/2;
-
-// Teleguiar leve da bola (magnet)
-const BALL_MAGNET = 0.28;        // força leve de atração
+const BALL_MAGNET = 0.22;   // teleguiar leve
 
 function applyMovement(p, inp, speed, dt) {
   let ax = 0, ay = 0;
@@ -336,26 +228,25 @@ function applyMovement(p, inp, speed, dt) {
   if (inp.down) ay += 1;
 
   if (ax || ay) {
-    const len = Math.hypot(ax, ay);
+    const len = Math.hypot(ax, ay) || 1;
     ax /= len; ay /= len;
-    p.vx += ax * speed * dt * 5.4;
-    p.vy += ay * speed * dt * 5.4;
+    p.vx += ax * speed * dt * 5.3;
+    p.vy += ay * speed * dt * 5.3;
   }
 
   p.x += p.vx * dt;
   p.y += p.vy * dt;
-  p.vx *= FRICTION;
-  p.vy *= FRICTION;
+  p.vx *= PLAYER_FRICTION;
+  p.vy *= PLAYER_FRICTION;
 
-  // KICK
   if (inp.kick) {
     const b = phys.ball;
     const dx = b.x - p.x, dy = b.y - p.y;
     const dist = Math.hypot(dx, dy) || 1;
-    if (dist < 58) {
-      const f = inp.sprint ? KICK_FORCE * 1.35 : KICK_FORCE;
-      b.vx += (dx/dist) * f;
-      b.vy += (dy/dist) * f;
+    if (dist < 60) {
+      const f = inp.sprint ? KICK_FORCE * 1.4 : KICK_FORCE;
+      b.vx += (dx / dist) * f;
+      b.vy += (dy / dist) * f;
     }
     inp.kick = false;
   }
@@ -377,27 +268,26 @@ function updatePhysics(dt) {
   b.vx *= BALL_FRICTION;
   b.vy *= BALL_FRICTION;
 
-  // TELEGUIAR LEVE DA BOLA (magnet)
+  // Teleguiar leve da bola
   [phys.p1, phys.p2].forEach(p => {
     const dx = b.x - p.x;
     const dy = b.y - p.y;
     const dist = Math.hypot(dx, dy);
-    if (dist < 48 && dist > 0) {
+    if (dist < 50 && dist > 5) {
       const nx = dx / dist;
       const ny = dy / dist;
-      b.vx += nx * BALL_MAGNET * (p.vx * 0.6 + 80);   // puxa levemente na direção do jogador
-      b.vy += ny * BALL_MAGNET * (p.vy * 0.6 + 80);
+      b.vx += nx * BALL_MAGNET * 90;
+      b.vy += ny * BALL_MAGNET * 90;
     }
   });
 
   // Gols
-  if (b.x < GOAL_W && b.y > GOAL_Y && b.y < GOAL_Y + GOAL_H && b.x < 0) scoreGoal('p2');
-  if (b.x > CANVAS_W - GOAL_W && b.y > GOAL_Y && b.y < GOAL_Y + GOAL_H && b.x > CANVAS_W) scoreGoal('p1');
+  if ((b.x < GOAL_W && b.y > GOAL_Y && b.y < GOAL_Y + GOAL_H && b.x < 0)) scoreGoal('p2');
+  if ((b.x > CANVAS_W - GOAL_W && b.y > GOAL_Y && b.y < GOAL_Y + GOAL_H && b.x > CANVAS_W)) scoreGoal('p1');
 
-  // Paredes
   if (b.y - b.r < 0 || b.y + b.r > CANVAS_H) {
     b.y = Math.max(b.r, Math.min(CANVAS_H - b.r, b.y));
-    b.vy *= -0.7;
+    b.vy *= -0.68;
   }
 
   document.getElementById('boost-indicator').style.display = myInput.sprint ? 'block' : 'none';
@@ -405,19 +295,14 @@ function updatePhysics(dt) {
 
 function scoreGoal(scorer) {
   phys[scorer].score++;
-  phys.phase = 'goal';
-
   const overlay = document.getElementById('goal-overlay');
-  document.getElementById('goal-scorer').textContent = phys[scorer].name + " MARCOU!";
+  document.getElementById('goal-scorer').textContent = (phys[scorer].name || scorer) + " MARCOU!";
   overlay.style.display = 'flex';
 
   setTimeout(() => {
     resetPositions();
-    phys.phase = 'playing';
     overlay.style.display = 'none';
-  }, 2300);
-
-  broadcastState();
+  }, 2200);
 }
 
 function resetPositions() {
@@ -429,24 +314,20 @@ function resetPositions() {
 function draw() {
   ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
-  // Gramado
   for (let i = 0; i < 14; i++) {
     ctx.fillStyle = i % 2 === 0 ? '#1e6b1e' : '#1a5c1a';
     ctx.fillRect(i * (CANVAS_W/14), 0, CANVAS_W/14, CANVAS_H);
   }
 
-  // Gols
   ctx.fillStyle = 'rgba(0,0,0,0.45)';
   ctx.fillRect(0, GOAL_Y, GOAL_W, GOAL_H);
   ctx.fillRect(CANVAS_W - GOAL_W, GOAL_Y, GOAL_W, GOAL_H);
 
-  // Bola
   ctx.fillStyle = '#f5f5dc';
   ctx.beginPath();
   ctx.arc(phys.ball.x, phys.ball.y, phys.ball.r, 0, Math.PI*2);
   ctx.fill();
 
-  // Jogadores
   [phys.p1, phys.p2].forEach((p, i) => {
     ctx.fillStyle = p.color;
     ctx.beginPath();
@@ -456,7 +337,7 @@ function draw() {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 20px Bebas Neue';
     ctx.textAlign = 'center';
-    ctx.fillText(i===0 ? '1' : '2', p.x, p.y+7);
+    ctx.fillText(i === 0 ? '1' : '2', p.x, p.y + 7);
   });
 }
 
@@ -469,9 +350,9 @@ function updateSB() {
   document.getElementById('sb-time').textContent = `${Math.floor(t/60)}:${(t%60).toString().padStart(2,'0')}`;
 }
 
-// ====================== FIREBASE + LOBBY ======================
+// ====================== LOBBY + FIREBASE ======================
 document.getElementById('btn-play').onclick = () => {
-  myName = document.getElementById('inp-name').value.trim().toUpperCase() || "JOGADOR";
+  myName = (document.getElementById('inp-name').value.trim().toUpperCase() || "JOGADOR").slice(0,12);
   document.getElementById('config-card').style.display = 'none';
   document.getElementById('cj-card').style.display = 'block';
 };
@@ -490,22 +371,17 @@ async function createRoom() {
   phys.p1.name = myName;
   phys.p1.color = myColor;
 
-  await set(ref(db, `futloco/${roomCode}`), {
-    p1: { name: myName, color: myColor },
-    p2: null,
-    phase: 'waiting',
-    state: null
-  });
+  await set(ref(db, `futloco/${roomCode}`), { p1: { name: myName, color: myColor }, p2: null, phase: 'waiting', state: null });
 
   document.getElementById('cj-card').style.display = 'none';
   document.getElementById('wait-card').style.display = 'block';
   document.getElementById('disp-code').textContent = roomCode;
 
   onValue(ref(db, `futloco/${roomCode}/p2`), snap => {
-    const data = snap.val();
-    if (data?.name) {
-      phys.p2.name = data.name;
-      phys.p2.color = data.color || '#3a6fe8';
+    const d = snap.val();
+    if (d && d.name) {
+      phys.p2.name = d.name;
+      phys.p2.color = d.color || '#3a6fe8';
       startGame();
     }
   });
@@ -518,12 +394,9 @@ async function joinRoom() {
   phys.p2.name = myName;
   phys.p2.color = myColor;
 
-  await update(ref(db, `futloco/${code}`), {
-    p2: { name: myName, color: myColor },
-    phase: 'playing'
-  });
-
+  await update(ref(db, `futloco/${code}`), { p2: { name: myName, color: myColor }, phase: 'playing' });
   roomCode = code;
+
   onValue(ref(db, `futloco/${code}/state`), snap => {
     if (snap.val()) applyServerState(snap.val());
   });
@@ -551,31 +424,32 @@ function startGame() {
 
 function setupInput() {
   window.addEventListener('keydown', e => {
-    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') myInput.sprint = true;
-    if (e.code === 'Space' || e.code === 'Enter') myInput.kick = true;
+    if (['ShiftLeft','ShiftRight'].includes(e.code)) myInput.sprint = true;
+    if (['Space','Enter'].includes(e.code)) myInput.kick = true;
 
-    if (myRole === 'p1') {
-      if (e.code === 'KeyA' || e.code === 'ArrowLeft') myInput.left = true;
-      if (e.code === 'KeyD' || e.code === 'ArrowRight') myInput.right = true;
-      if (e.code === 'KeyW' || e.code === 'ArrowUp') myInput.up = true;
-      if (e.code === 'KeyS' || e.code === 'ArrowDown') myInput.down = true;
+    const keysP1 = myRole === 'p1';
+    if (keysP1) {
+      if (['KeyA','ArrowLeft'].includes(e.code)) myInput.left = true;
+      if (['KeyD','ArrowRight'].includes(e.code)) myInput.right = true;
+      if (['KeyW','ArrowUp'].includes(e.code)) myInput.up = true;
+      if (['KeyS','ArrowDown'].includes(e.code)) myInput.down = true;
     } else {
-      if (e.code === 'KeyA' || e.code === 'ArrowLeft') myInput.left = true;
-      if (e.code === 'KeyD' || e.code === 'ArrowRight') myInput.right = true;
-      if (e.code === 'KeyW' || e.code === 'ArrowUp') myInput.up = true;
-      if (e.code === 'KeyS' || e.code === 'ArrowDown') myInput.down = true;
+      if (['KeyA','ArrowLeft'].includes(e.code)) myInput.left = true;
+      if (['KeyD','ArrowRight'].includes(e.code)) myInput.right = true;
+      if (['KeyW','ArrowUp'].includes(e.code)) myInput.up = true;
+      if (['KeyS','ArrowDown'].includes(e.code)) myInput.down = true;
     }
   });
 
-  window.addEventListener('keyup', e => {
-    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') myInput.sprint = false;
-    if (e.code === 'Space' || e.code === 'Enter') myInput.kick = false;
+  window.addEventListener('keyup', () => {
+    myInput.sprint = false;
+    myInput.kick = false;
     myInput.left = myInput.right = myInput.up = myInput.down = false;
   });
 }
 
 function gameLoop(ts = 0) {
-  const dt = Math.min((ts - lastTs)/1000, 0.05);
+  const dt = Math.min((ts - lastTs) / 1000, 0.05);
   lastTs = ts;
 
   if (phys.phase === 'playing') {
@@ -587,9 +461,9 @@ function gameLoop(ts = 0) {
   draw();
   updateSB();
 
-  broadcastTimer += dt;
-  if (broadcastTimer > 0.06) {   // ← reduzido para menos tremida
-    broadcastTimer = 0;
+  const now = Date.now();
+  if (now - lastBroadcast > 80) {   // ← chave para reduzir tremor
+    lastBroadcast = now;
     broadcastState();
   }
 
@@ -597,39 +471,36 @@ function gameLoop(ts = 0) {
 }
 
 function gameLoopP2(ts = 0) {
-  const dt = Math.min((ts - lastTs)/1000, 0.05);
+  const dt = Math.min((ts - lastTs) / 1000, 0.05);
   lastTs = ts;
 
   updatePhysics(dt);
   draw();
   updateSB();
 
-  broadcastTimer += dt;
-  if (broadcastTimer > 0.06) {
-    broadcastTimer = 0;
-    update(ref(db, `futloco/${roomCode}/p2input`), {...myInput});
+  const now = Date.now();
+  if (now - lastBroadcast > 80) {
+    lastBroadcast = now;
+    update(ref(db, `futloco/${roomCode}/p2input`), { ...myInput });
   }
 
   requestAnimationFrame(gameLoopP2);
 }
 
-// ====================== RECONCILIAÇÃO SUAVE (menos tremida) ======================
 function applyServerState(st) {
   if (!st) return;
+  // Interpolação suave para reduzir tremor
+  phys.p1.x = phys.p1.x * 0.7 + (st.p1x || phys.p1.x) * 0.3;
+  phys.p1.y = phys.p1.y * 0.7 + (st.p1y || phys.p1.y) * 0.3;
 
-  // P1 (autoridade) recebe correção leve
-  phys.p1.x = phys.p1.x * 0.65 + st.p1x * 0.35;
-  phys.p1.y = phys.p1.y * 0.65 + st.p1y * 0.35;
+  phys.p2.x = phys.p2.x * 0.78 + (st.p2x || phys.p2.x) * 0.22;
+  phys.p2.y = phys.p2.y * 0.78 + (st.p2y || phys.p2.y) * 0.22;
 
-  // P2 recebe correção ainda mais suave
-  phys.p2.x = phys.p2.x * 0.75 + st.p2x * 0.25;
-  phys.p2.y = phys.p2.y * 0.75 + st.p2y * 0.25;
-
-  phys.ball.x = st.bx;
-  phys.ball.y = st.by;
-  phys.p1.score = st.s1;
-  phys.p2.score = st.s2;
-  phys.time = st.time;
+  phys.ball.x = st.bx || phys.ball.x;
+  phys.ball.y = st.by || phys.ball.y;
+  phys.p1.score = st.s1 ?? phys.p1.score;
+  phys.p2.score = st.s2 ?? phys.p2.score;
+  phys.time = st.time ?? phys.time;
 }
 
 function broadcastState() {
@@ -638,8 +509,7 @@ function broadcastState() {
     p2x: phys.p2.x, p2y: phys.p2.y,
     bx: phys.ball.x, by: phys.ball.y,
     s1: phys.p1.score, s2: phys.p2.score,
-    time: phys.time,
-    phase: phys.phase
+    time: phys.time
   });
 }
 
