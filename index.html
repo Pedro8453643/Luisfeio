@@ -26,7 +26,7 @@ body {
   user-select: none;
 }
 
-/* MENU / LOBBY */
+/* LOBBY */
 #lobby {
   display: flex;
   flex-direction: column;
@@ -151,7 +151,7 @@ canvas#gc {
   z-index: 100;
 }
 
-/* ANIMAÇÃO DE GOL */
+/* ANIMAÇÃO DE GOL MELHORADA */
 #goal-overlay {
   position: absolute;
   inset: 0;
@@ -159,31 +159,31 @@ canvas#gc {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background: rgba(0,0,0,0.75);
+  background: rgba(0,0,0,0.78);
   z-index: 60;
-  animation: goalPop 0.4s ease forwards;
+  animation: goalPop 0.5s ease forwards;
 }
 @keyframes goalPop {
-  0% { transform: scale(0.4) rotate(-8deg); opacity: 0; }
-  60% { transform: scale(1.15) rotate(4deg); }
+  0% { transform: scale(0.3) rotate(-12deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(6deg); }
   100% { transform: scale(1) rotate(0); opacity: 1; }
 }
 .goal-text {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 6.5rem;
+  font-size: 6.8rem;
   color: var(--yellow);
-  text-shadow: 0 0 50px rgba(245,208,0,0.9), 4px 4px 0 #000;
-  animation: goalShake 0.6s ease infinite alternate;
+  text-shadow: 0 0 60px rgba(245,208,0,0.95), 6px 6px 0 #000;
+  animation: goalShake 0.4s ease infinite alternate;
 }
 @keyframes goalShake {
-  from { transform: translateX(-6px); }
-  to { transform: translateX(6px); }
+  from { transform: translateX(-8px); }
+  to { transform: translateX(8px); }
 }
 #goal-scorer {
-  font-size: 2rem;
+  font-size: 2.1rem;
   color: #ddd;
-  margin-top: 10px;
-  letter-spacing: 0.1em;
+  margin-top: 15px;
+  letter-spacing: 0.15em;
 }
 
 /* RESULT */
@@ -211,7 +211,6 @@ canvas#gc {
 </head>
 <body>
 
-<!-- LOBBY / MENU -->
 <div id="lobby">
   <div class="logo-wrap">
     <h1>FUTLOCO</h1>
@@ -255,15 +254,14 @@ canvas#gc {
   </div>
 </div>
 
-<!-- GAME -->
 <div id="game">
   <div class="scoreboard">
-    <div class="sb-player" id="sb-p1"><span id="sb-name1"></span></div>
+    <div><span id="sb-name1"></span></div>
     <div style="text-align:center">
       <div class="sb-score" id="sb-score">0 — 0</div>
       <div id="sb-time" style="font-size:1.4rem;color:#ddd;">3:00</div>
     </div>
-    <div class="sb-player" id="sb-p2" style="text-align:right"><span id="sb-name2"></span></div>
+    <div style="text-align:right"><span id="sb-name2"></span></div>
   </div>
 
   <div id="canvas-wrap">
@@ -276,8 +274,8 @@ canvas#gc {
   </div>
 
   <div style="width:min(780px,98vw);padding:0.8rem 1.5rem;background:#111;color:#777;font-size:1.05rem;display:flex;justify-content:space-between;">
-    <span id="ctrl-p1-hint">WASD + ESPAÇO + SHIFT (sprint)</span>
-    <span id="ctrl-p2-hint">SETAS + ENTER + SHIFT (sprint)</span>
+    <span>WASD + ESPAÇO + SHIFT (sprint)</span>
+    <span>SETAS + ENTER + SHIFT (sprint)</span>
   </div>
 </div>
 
@@ -319,13 +317,16 @@ const myInput = { left:false, right:false, up:false, down:false, kick:false, spr
 
 let canvas, ctx, lastTs = 0, broadcastTimer = 0;
 
-// Física
+// ==================== FÍSICA AJUSTADA (menos tremida) ====================
 const BASE_SPEED = 270;
 const SPRINT_SPEED = 480;
-const FRICTION = 0.82;
-const BALL_FRICTION = 0.977;
+const FRICTION = 0.83;           // aumentado para mais estabilidade
+const BALL_FRICTION = 0.978;
 const KICK_FORCE = 530;
 const GOAL_W = 14, GOAL_H = 120, GOAL_Y = (CANVAS_H - GOAL_H)/2;
+
+// Teleguiar leve da bola (magnet)
+const BALL_MAGNET = 0.28;        // força leve de atração
 
 function applyMovement(p, inp, speed, dt) {
   let ax = 0, ay = 0;
@@ -337,8 +338,8 @@ function applyMovement(p, inp, speed, dt) {
   if (ax || ay) {
     const len = Math.hypot(ax, ay);
     ax /= len; ay /= len;
-    p.vx += ax * speed * dt * 5.5;
-    p.vy += ay * speed * dt * 5.5;
+    p.vx += ax * speed * dt * 5.4;
+    p.vy += ay * speed * dt * 5.4;
   }
 
   p.x += p.vx * dt;
@@ -346,11 +347,12 @@ function applyMovement(p, inp, speed, dt) {
   p.vx *= FRICTION;
   p.vy *= FRICTION;
 
+  // KICK
   if (inp.kick) {
     const b = phys.ball;
     const dx = b.x - p.x, dy = b.y - p.y;
     const dist = Math.hypot(dx, dy) || 1;
-    if (dist < 55) {
+    if (dist < 58) {
       const f = inp.sprint ? KICK_FORCE * 1.35 : KICK_FORCE;
       b.vx += (dx/dist) * f;
       b.vy += (dy/dist) * f;
@@ -363,8 +365,8 @@ function applyMovement(p, inp, speed, dt) {
 }
 
 function updatePhysics(dt) {
-  const p1in = myRole === 'p1' ? myInput : (phys.p1._remoteInput || myInput);
-  const p2in = myRole === 'p2' ? myInput : (phys.p2._remoteInput || myInput);
+  const p1in = myRole === 'p1' ? myInput : (phys.p1._remoteInput || {});
+  const p2in = myRole === 'p2' ? myInput : (phys.p2._remoteInput || {});
 
   applyMovement(phys.p1, p1in, p1in.sprint ? SPRINT_SPEED : BASE_SPEED, dt);
   applyMovement(phys.p2, p2in, p2in.sprint ? SPRINT_SPEED : BASE_SPEED, dt);
@@ -375,11 +377,28 @@ function updatePhysics(dt) {
   b.vx *= BALL_FRICTION;
   b.vy *= BALL_FRICTION;
 
-  // Paredes e gols
-  if (b.y - b.r < 0 || b.y + b.r > CANVAS_H) { b.y = Math.max(b.r, Math.min(CANVAS_H - b.r, b.y)); b.vy *= -0.72; }
+  // TELEGUIAR LEVE DA BOLA (magnet)
+  [phys.p1, phys.p2].forEach(p => {
+    const dx = b.x - p.x;
+    const dy = b.y - p.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 48 && dist > 0) {
+      const nx = dx / dist;
+      const ny = dy / dist;
+      b.vx += nx * BALL_MAGNET * (p.vx * 0.6 + 80);   // puxa levemente na direção do jogador
+      b.vy += ny * BALL_MAGNET * (p.vy * 0.6 + 80);
+    }
+  });
 
-  if (b.x < GOAL_W && b.y > GOAL_Y && b.y < GOAL_Y + GOAL_H) { if (b.x < 0) scoreGoal('p2'); }
-  if (b.x > CANVAS_W - GOAL_W && b.y > GOAL_Y && b.y < GOAL_Y + GOAL_H) { if (b.x > CANVAS_W) scoreGoal('p1'); }
+  // Gols
+  if (b.x < GOAL_W && b.y > GOAL_Y && b.y < GOAL_Y + GOAL_H && b.x < 0) scoreGoal('p2');
+  if (b.x > CANVAS_W - GOAL_W && b.y > GOAL_Y && b.y < GOAL_Y + GOAL_H && b.x > CANVAS_W) scoreGoal('p1');
+
+  // Paredes
+  if (b.y - b.r < 0 || b.y + b.r > CANVAS_H) {
+    b.y = Math.max(b.r, Math.min(CANVAS_H - b.r, b.y));
+    b.vy *= -0.7;
+  }
 
   document.getElementById('boost-indicator').style.display = myInput.sprint ? 'block' : 'none';
 }
@@ -392,14 +411,13 @@ function scoreGoal(scorer) {
   document.getElementById('goal-scorer').textContent = phys[scorer].name + " MARCOU!";
   overlay.style.display = 'flex';
 
-  broadcastState();
-
   setTimeout(() => {
     resetPositions();
     phys.phase = 'playing';
     overlay.style.display = 'none';
-    broadcastState();
-  }, 2400);
+  }, 2300);
+
+  broadcastState();
 }
 
 function resetPositions() {
@@ -467,7 +485,7 @@ document.getElementById('color-pick').onclick = e => {
 };
 
 async function createRoom() {
-  roomCode = Math.random().toString(36).slice(2,6).toUpperCase().toUpperCase();
+  roomCode = Math.random().toString(36).slice(2,6).toUpperCase();
   myRole = 'p1';
   phys.p1.name = myName;
   phys.p1.color = myColor;
@@ -485,7 +503,7 @@ async function createRoom() {
 
   onValue(ref(db, `futloco/${roomCode}/p2`), snap => {
     const data = snap.val();
-    if (data && data.name) {
+    if (data?.name) {
       phys.p2.name = data.name;
       phys.p2.color = data.color || '#3a6fe8';
       startGame();
@@ -496,7 +514,6 @@ async function createRoom() {
 async function joinRoom() {
   const code = document.getElementById('inp-code').value.trim().toUpperCase();
   if (code.length !== 4) return;
-
   myRole = 'p2';
   phys.p2.name = myName;
   phys.p2.color = myColor;
@@ -525,7 +542,7 @@ function startGame() {
   setupInput();
 
   if (myRole === 'p1') {
-    onValue(ref(db, `futloco/${roomCode}/p2input`), s => { if(s.val()) phys.p2._remoteInput = s.val(); });
+    onValue(ref(db, `futloco/${roomCode}/p2input`), s => { if (s.val()) phys.p2._remoteInput = s.val(); });
     gameLoop();
   } else {
     gameLoopP2();
@@ -537,8 +554,7 @@ function setupInput() {
     if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') myInput.sprint = true;
     if (e.code === 'Space' || e.code === 'Enter') myInput.kick = true;
 
-    const isP1 = myRole === 'p1';
-    if (isP1) {
+    if (myRole === 'p1') {
       if (e.code === 'KeyA' || e.code === 'ArrowLeft') myInput.left = true;
       if (e.code === 'KeyD' || e.code === 'ArrowRight') myInput.right = true;
       if (e.code === 'KeyW' || e.code === 'ArrowUp') myInput.up = true;
@@ -554,9 +570,7 @@ function setupInput() {
   window.addEventListener('keyup', e => {
     if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') myInput.sprint = false;
     if (e.code === 'Space' || e.code === 'Enter') myInput.kick = false;
-    if (['KeyA','KeyD','KeyW','KeyS','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.code)) {
-      myInput.left = myInput.right = myInput.up = myInput.down = false;
-    }
+    myInput.left = myInput.right = myInput.up = myInput.down = false;
   });
 }
 
@@ -574,7 +588,7 @@ function gameLoop(ts = 0) {
   updateSB();
 
   broadcastTimer += dt;
-  if (broadcastTimer > 0.045) {
+  if (broadcastTimer > 0.06) {   // ← reduzido para menos tremida
     broadcastTimer = 0;
     broadcastState();
   }
@@ -591,7 +605,7 @@ function gameLoopP2(ts = 0) {
   updateSB();
 
   broadcastTimer += dt;
-  if (broadcastTimer > 0.045) {
+  if (broadcastTimer > 0.06) {
     broadcastTimer = 0;
     update(ref(db, `futloco/${roomCode}/p2input`), {...myInput});
   }
@@ -599,17 +613,23 @@ function gameLoopP2(ts = 0) {
   requestAnimationFrame(gameLoopP2);
 }
 
+// ====================== RECONCILIAÇÃO SUAVE (menos tremida) ======================
 function applyServerState(st) {
   if (!st) return;
-  phys.p1.x = st.p1x || phys.p1.x;
-  phys.p1.y = st.p1y || phys.p1.y;
-  phys.p2.x = st.p2x || phys.p2.x;
-  phys.p2.y = st.p2y || phys.p2.y;
-  phys.ball.x = st.bx || phys.ball.x;
-  phys.ball.y = st.by || phys.ball.y;
-  phys.p1.score = st.s1 ?? phys.p1.score;
-  phys.p2.score = st.s2 ?? phys.p2.score;
-  phys.time = st.time ?? phys.time;
+
+  // P1 (autoridade) recebe correção leve
+  phys.p1.x = phys.p1.x * 0.65 + st.p1x * 0.35;
+  phys.p1.y = phys.p1.y * 0.65 + st.p1y * 0.35;
+
+  // P2 recebe correção ainda mais suave
+  phys.p2.x = phys.p2.x * 0.75 + st.p2x * 0.25;
+  phys.p2.y = phys.p2.y * 0.75 + st.p2y * 0.25;
+
+  phys.ball.x = st.bx;
+  phys.ball.y = st.by;
+  phys.p1.score = st.s1;
+  phys.p2.score = st.s2;
+  phys.time = st.time;
 }
 
 function broadcastState() {
@@ -633,10 +653,7 @@ function endGame() {
 // Botões
 document.getElementById('btn-create').onclick = createRoom;
 document.getElementById('btn-join').onclick = joinRoom;
-document.getElementById('btn-copy').onclick = () => {
-  navigator.clipboard.writeText(roomCode);
-  alert('Código copiado!');
-};
+document.getElementById('btn-copy').onclick = () => navigator.clipboard.writeText(roomCode).then(() => alert('Código copiado!'));
 </script>
 </body>
 </html>
