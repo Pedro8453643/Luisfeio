@@ -3,68 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FUTLOCO Pro — 1v1 Online</title>
+<title>FUTLOCO Elite — 1v1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Teko:wght@400;600&display=swap');
 
-:root {
-  --grass-dark: #1a5c1a;
-  --grass-light: #247a24;
-  --yellow: #f5d000;
-  --bg: #0f0f0f;
-}
-
+:root { --y: #f5d000; --g1: #1a5c1a; --g2: #247a24; }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background: var(--bg); color: #fff; font-family: 'Teko', sans-serif; overflow: hidden; }
+body { background: #0a0a0a; color: #fff; font-family: 'Teko', sans-serif; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100vh; }
 
-/* LAYOUT LOBBY */
-#lobby { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 20px; }
-.card { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-h1 { font-family: 'Bebas Neue'; font-size: 5rem; color: var(--yellow); margin-bottom: 0; line-height: 0.8; }
-input { width: 100%; padding: 12px; margin: 15px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; font-size: 1.2rem; text-align: center; }
-.btn { width: 100%; padding: 12px; background: var(--yellow); border: none; border-radius: 8px; font-family: 'Bebas Neue'; font-size: 1.5rem; cursor: pointer; transition: 0.2s; color: #000; }
-.btn:hover { transform: scale(1.03); filter: brightness(1.1); }
+/* LOBBY UI */
+.card { background: #151515; padding: 2rem; border-radius: 15px; border: 1px solid #333; width: 320px; text-align: center; box-shadow: 0 10px 40px #000; }
+h1 { font-family: 'Bebas Neue'; font-size: 4.5rem; color: var(--y); line-height: 0.9; margin-bottom: 1rem; }
+input { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px; font-size: 1.1rem; text-align: center; }
+.btn { width: 100%; padding: 12px; background: var(--y); border: none; border-radius: 5px; font-family: 'Bebas Neue'; font-size: 1.4rem; cursor: pointer; color: #000; }
 
-/* JOGO */
-#game-ui { display: none; flex-direction: column; align-items: center; width: 100vw; padding-top: 10px; }
-.sb { display: flex; justify-content: space-around; width: 780px; background: #111; padding: 10px; border-radius: 10px 10px 0 0; border: 2px solid #333; border-bottom: none; }
-.score { font-family: 'Bebas Neue'; font-size: 3rem; color: var(--yellow); }
-canvas { background: var(--grass-dark); border: 4px solid #333; border-radius: 0 0 10px 10px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
-
-#goal-alert { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Bebas Neue'; font-size: 8rem; color: var(--yellow); text-shadow: 0 0 30px #000; display: none; z-index: 10; pointer-events: none; }
+/* GAME UI */
+#game-ui { display: none; flex-direction: column; align-items: center; }
+.sb { width: 780px; display: flex; justify-content: space-between; padding: 10px 20px; background: #111; border: 2px solid #333; border-radius: 10px 10px 0 0; font-size: 1.5rem; }
+canvas { background: var(--g1); border: 3px solid #333; border-radius: 0 0 10px 10px; cursor: none; }
+#goal-txt { position: absolute; top: 50%; font-family: 'Bebas Neue'; font-size: 7rem; color: var(--y); display: none; text-shadow: 3px 3px 0 #000; pointer-events: none; }
 </style>
 </head>
 <body>
 
 <div id="lobby">
-  <h1>FUTLOCO</h1>
   <div class="card" id="step1">
+    <h1>FUTLOCO</h1>
     <input type="text" id="nick" placeholder="SEU NICK" maxlength="10">
-    <button class="btn" onclick="goToStep2()">PRÓXIMO</button>
+    <button class="btn" onclick="start()">ENTRAR NO CLUB</button>
   </div>
   <div class="card" id="step2" style="display:none">
-    <button class="btn" onclick="createRoom()">CRIAR SALA</button>
-    <input type="text" id="room-input" placeholder="CÓDIGO">
-    <button class="btn" style="background:#444; color:#fff" onclick="joinRoom()">ENTRAR</button>
+    <button class="btn" onclick="create()">CRIAR SALA</button>
+    <input type="text" id="room-in" placeholder="CÓDIGO">
+    <button class="btn" style="background:#333; color:#fff; margin-top:5px" onclick="join()">ENTRAR NA SALA</button>
   </div>
   <div class="card" id="step-wait" style="display:none">
-    <p>CÓDIGO DA SALA:</p>
-    <h2 id="room-display" style="font-size:3rem; color:var(--yellow)">----</h2>
-    <p>AGUARDANDO OPONENTE...</p>
+    <p>CÓDIGO:</p>
+    <h2 id="room-code-dis" style="font-size:3rem; color:var(--y)">----</h2>
+    <p>AGUARDANDO ADVERSÁRIO...</p>
   </div>
 </div>
 
 <div id="game-ui">
   <div class="sb">
-    <div id="n1" style="width:200px">P1</div>
-    <div class="score" id="score-text">0 - 0</div>
-    <div id="n2" style="width:200px; text-align:right">P2</div>
+    <span id="n1">P1</span>
+    <span style="color:var(--y); font-weight:bold" id="score">0 - 0</span>
+    <span id="n2">P2</span>
   </div>
   <canvas id="gc"></canvas>
-  <p style="margin-top:10px; color:#666">WASD para mover | SHIFT para Correr</p>
+  <div id="goal-txt">GOOOOL!</div>
 </div>
-
-<div id="goal-alert">GOOOOL!</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -75,19 +63,15 @@ const firebaseConfig = {
   authDomain: "futebol-7df3e.firebaseapp.com",
   databaseURL: "https://futebol-7df3e-default-rtdb.firebaseio.com",
   projectId: "futebol-7df3e",
-  storageBucket: "futebol-7df3e.firebasestorage.app",
-  messagingSenderId: "705698542572",
-  appId: "1:705698542572:web:3460d33b213c8a366ac6c9"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Configurações Técnicas
-const W = 780, H = 440, FPS = 60;
-let myRole = '', roomCode = '', myNick = '';
-let canvas = document.getElementById('gc'), ctx = canvas.getContext('2d');
-canvas.width = W; canvas.height = H;
+const W = 780, H = 440;
+let myRole = '', roomCode = '', myNick = '', frameCount = 0;
+const cv = document.getElementById('gc'), ctx = cv.getContext('2d');
+cv.width = W; cv.height = H;
 
 const state = {
   p1: { x: 150, y: 220, r: 18, s: 0, nick: '' },
@@ -97,163 +81,163 @@ const state = {
 };
 
 const keys = {};
-const p1In = { up:0, down:0, left:0, right:0, shift:0 };
-const p2In = { up:0, down:0, left:0, right:0, shift:0 };
+const p1In = { u:0, d:0, l:0, r:0, s:0 };
+const p2In = { u:0, d:0, l:0, r:0, s:0 };
 
-// --- LÓGICA DE INTERFACE ---
-window.goToStep2 = () => {
-  myNick = document.getElementById('nick').value.toUpperCase() || 'PLAYER';
+window.start = () => {
+  myNick = document.getElementById('nick').value || 'PLAYER';
   document.getElementById('step1').style.display = 'none';
-  document.getElementById('step2').style.display = 'flex';
+  document.getElementById('step2').style.display = 'block';
 };
 
-window.createRoom = async () => {
+window.create = async () => {
   roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-  myRole = 'p1';
-  state.p1.nick = myNick;
-  await set(ref(db, `fut/${roomCode}`), { state, p1In, p2In });
+  myRole = 'p1'; state.p1.nick = myNick;
+  await set(ref(db, `f/${roomCode}`), { state, p1In, p2In });
   document.getElementById('step2').style.display = 'none';
   document.getElementById('step-wait').style.display = 'block';
-  document.getElementById('room-display').textContent = roomCode;
+  document.getElementById('room-code-dis').textContent = roomCode;
   
-  onValue(ref(db, `fut/${roomCode}/p2In`), s => { if(s.val()) Object.assign(p2In, s.val()); });
-  onValue(ref(db, `fut/${roomCode}/p2Nick`), s => { if(s.val()) { state.p2.nick = s.val(); initGame(); }});
+  onValue(ref(db, `f/${roomCode}/p2In`), s => { if(s.val()) Object.assign(p2In, s.val()); });
+  onValue(ref(db, `f/${roomCode}/p2N`), s => { if(s.val()) { state.p2.nick = s.val(); run(); }});
 };
 
-window.joinRoom = async () => {
-  roomCode = document.getElementById('room-input').value.toUpperCase();
-  myRole = 'p2';
-  update(ref(db, `fut/${roomCode}`), { p2Nick: myNick });
-  onValue(ref(db, `fut/${roomCode}/p1In`), s => { if(s.val()) Object.assign(p1In, s.val()); });
-  onValue(ref(db, `fut/${roomCode}/state`), s => { if(s.val()) Object.assign(state, s.val()); });
-  initGame();
+window.join = async () => {
+  roomCode = document.getElementById('room-in').value.toUpperCase();
+  myRole = 'p2'; state.p2.nick = myNick;
+  update(ref(db, `f/${roomCode}`), { p2N: myNick });
+  onValue(ref(db, `f/${roomCode}/p1In`), s => { if(s.val()) Object.assign(p1In, s.val()); });
+  onValue(ref(db, `f/${roomCode}/state`), s => { if(s.val()) Object.assign(state, s.val()); });
+  run();
 };
 
-function initGame() {
+function run() {
   document.getElementById('lobby').style.display = 'none';
   document.getElementById('game-ui').style.display = 'flex';
   window.addEventListener('keydown', e => keys[e.code] = true);
   window.addEventListener('keyup', e => keys[e.code] = false);
-  setInterval(loop, 1000/FPS);
+  requestAnimationFrame(loop);
 }
 
-// --- FÍSICA (SOMENTE P1) ---
-function runPhysics() {
+function physics() {
   if (myRole !== 'p1' || state.goal) return;
 
-  const handleMove = (p, input) => {
-    const spd = input.shift ? 6 : 3.5;
-    if (input.up) p.y -= spd; if (input.down) p.y += spd;
-    if (input.left) p.x -= spd; if (input.right) p.x += spd;
+  const move = (p, inv) => {
+    const spd = inv.s ? 6 : 3.8;
+    if (inv.u) p.y -= spd; if (inv.d) p.y += spd;
+    if (inv.l) p.x -= spd; if (inv.r) p.x += spd;
     p.x = Math.max(p.r, Math.min(W - p.r, p.x));
     p.y = Math.max(p.r, Math.min(H - p.r, p.y));
   };
 
-  handleMove(state.p1, p1In);
-  handleMove(state.p2, p2In);
+  move(state.p1, p1In);
+  move(state.p2, p2In);
 
-  // Bola
   state.ball.x += state.ball.vx;
   state.ball.y += state.ball.vy;
-  state.ball.vx *= 0.97; state.ball.vy *= 0.97;
+  state.ball.vx *= 0.98; state.ball.vy *= 0.98;
 
-  // Rebote Paredes
-  if (state.ball.y < state.ball.r || state.ball.y > H - state.ball.r) state.ball.vy *= -1;
+  if (state.ball.y < 10 || state.ball.y > H - 10) state.ball.vy *= -1;
   
-  // Rebote Laterais (Traves)
-  const gY = (H-120)/2;
-  if (state.ball.x < state.ball.r || state.ball.x > W - state.ball.r) {
-    if (state.ball.y > gY && state.ball.y < gY + 120) {
-       // Checa se entrou totalmente
-       if(state.ball.x < -10 || state.ball.x > W + 10) triggerGoal(state.ball.x < W/2 ? 'p2' : 'p1');
+  const goalY = (H-120)/2;
+  if (state.ball.x < 10 || state.ball.x > W - 10) {
+    if (state.ball.y > goalY && state.ball.y < goalY + 120) {
+       if(state.ball.x < 0 || state.ball.x > W) score(state.ball.x < W/2 ? 'p2' : 'p1');
     } else {
       state.ball.vx *= -1;
-      state.ball.x = state.ball.x < W/2 ? state.ball.r : W - state.ball.r;
+      state.ball.x = state.ball.x < W/2 ? 11 : W-11;
     }
   }
 
-  // Colisão Jogador-Bola
   [state.p1, state.p2].forEach(p => {
     const dx = state.ball.x - p.x, dy = state.ball.y - p.y;
-    const dist = Math.hypot(dx, dy);
-    if (dist < p.r + state.ball.r) {
-      const ang = Math.atan2(dy, dx);
-      const force = 10;
-      state.ball.vx = Math.cos(ang) * force;
-      state.ball.vy = Math.sin(ang) * force;
+    const d = Math.hypot(dx, dy);
+    if (d < p.r + 10) {
+      const a = Math.atan2(dy, dx);
+      state.ball.vx = Math.cos(a) * 11;
+      state.ball.vy = Math.sin(a) * 11;
     }
   });
 
-  update(ref(db, `fut/${roomCode}/state`), state);
+  // OTIMIZAÇÃO: Só envia dados para o Firebase 20 vezes por segundo (a cada 3 frames)
+  if (frameCount % 3 === 0) {
+    update(ref(db, `f/${roomCode}/state`), state);
+  }
 }
 
-function triggerGoal(winner) {
-  state.goal = true;
-  state[winner].s++;
-  document.getElementById('goal-alert').style.display = 'block';
+function score(w) {
+  state.goal = true; state[w].s++;
+  document.getElementById('goal-txt').style.display = 'block';
   setTimeout(() => {
     state.ball = { x: 390, y: 220, vx: 0, vy: 0, r: 10 };
-    state.p1.x = 150; state.p1.y = 220;
-    state.p2.x = 630; state.p2.y = 220;
+    state.p1.x = 150; state.p2.x = 630;
     state.goal = false;
-    document.getElementById('goal-alert').style.display = 'none';
-  }, 2000);
-}
-
-// --- RENDERIZAÇÃO ---
-function draw() {
-  // 1. Gramado com textura
-  for(let i=0; i<W; i+=60) {
-    ctx.fillStyle = (i/60)%2==0 ? '#247a24' : '#1e6b1e';
-    ctx.fillRect(i, 0, 60, H);
-  }
-  // Linhas
-  ctx.strokeStyle = "rgba(255,255,255,0.3)";
-  ctx.lineWidth = 3;
-  ctx.strokeRect(5, 5, W-10, H-10);
-  ctx.beginPath(); ctx.arc(W/2, H/2, 60, 0, Math.PI*2); ctx.stroke();
-  ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
-
-  // 2. Gols (Textura de rede)
-  ctx.fillStyle = "#111";
-  const gY = (H-120)/2;
-  ctx.fillRect(0, gY, 15, 120); // Gol Esq
-  ctx.fillRect(W-15, gY, 15, 120); // Gol Dir
-  
-  // 3. Bola
-  ctx.shadowBlur = 10; ctx.shadowColor = "rgba(0,0,0,0.5)";
-  ctx.fillStyle = "#fff";
-  ctx.beginPath(); ctx.arc(state.ball.x, state.ball.y, state.ball.r, 0, Math.PI*2); ctx.fill();
-  ctx.shadowBlur = 0;
-
-  // 4. Jogadores
-  drawPlayer(state.p1, '#e84040');
-  drawPlayer(state.p2, '#3a6fe8');
-}
-
-function drawPlayer(p, color) {
-  ctx.fillStyle = color;
-  ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
-  ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke();
-  ctx.fillStyle = "#fff"; ctx.font = "14px Arial"; ctx.textAlign = "center";
-  ctx.fillText(p.nick, p.x, p.y - 25);
+    document.getElementById('goal-txt').style.display = 'none';
+  }, 1500);
 }
 
 function loop() {
-  const currentIn = {
-    up: keys['KeyW'] || keys['ArrowUp'] ? 1:0,
-    down: keys['KeyS'] || keys['ArrowDown'] ? 1:0,
-    left: keys['KeyA'] || keys['ArrowLeft'] ? 1:0,
-    right: keys['KeyD'] || keys['ArrowRight'] ? 1:0,
-    shift: keys['ShiftLeft'] || keys['ShiftRight'] ? 1:0
+  frameCount++;
+  const myIn = {
+    u: keys['KeyW'] || keys['ArrowUp'] ? 1:0,
+    d: keys['KeyS'] || keys['ArrowDown'] ? 1:0,
+    l: keys['KeyA'] || keys['ArrowLeft'] ? 1:0,
+    r: keys['KeyD'] || keys['ArrowRight'] ? 1:0,
+    s: keys['ShiftLeft'] || keys['ShiftRight'] ? 1:0
   };
-  update(ref(db, `fut/${roomCode}/${myRole}In`), currentIn);
   
-  if(myRole === 'p1') runPhysics();
+  // Envia input rápido (isso é leve)
+  if (frameCount % 2 === 0) {
+    update(ref(db, `f/${roomCode}/${myRole}In`), myIn);
+  }
+
+  // Atualiza input local para o P1 não sentir lag
+  if(myRole === 'p1') {
+      Object.assign(p1In, myIn);
+      physics();
+  } else {
+      Object.assign(p2In, myIn);
+  }
+
   draw();
-  document.getElementById('score-text').textContent = `${state.p1.s} - ${state.p2.s}`;
+  requestAnimationFrame(loop);
+}
+
+function draw() {
+  // Campo Listrado
+  for(let i=0; i<W; i+=60) {
+    ctx.fillStyle = (i/60)%2==0 ? '#1e6b1e' : '#247a24';
+    ctx.fillRect(i, 0, 60, H);
+  }
+  
+  // Linhas
+  ctx.strokeStyle = "rgba(255,255,255,0.2)"; ctx.lineWidth = 2;
+  ctx.strokeRect(10, 10, W-20, H-20);
+  ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
+  ctx.beginPath(); ctx.arc(W/2, H/2, 50, 0, Math.PI*2); ctx.stroke();
+
+  // Gols
+  ctx.fillStyle = "#111";
+  ctx.fillRect(0, (H-120)/2, 10, 120);
+  ctx.fillRect(W-10, (H-120)/2, 10, 120);
+
+  // Bola
+  ctx.fillStyle = "#fff"; ctx.beginPath();
+  ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI*2); ctx.fill();
+
+  // P1 e P2
+  drawP(state.p1, '#e84040');
+  drawP(state.p2, '#3a6fe8');
+  
+  document.getElementById('score').textContent = `${state.p1.s} - ${state.p2.s}`;
   document.getElementById('n1').textContent = state.p1.nick;
   document.getElementById('n2').textContent = state.p2.nick;
+}
+
+function drawP(p, c) {
+  ctx.fillStyle = c; ctx.beginPath();
+  ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke();
 }
 </script>
 </body>
