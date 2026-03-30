@@ -3,31 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FUTLOCO Elite — 1v1</title>
+<title>PINGPONG LOCO — Online</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Teko:wght@400;600&display=swap');
-:root { --y: #f5d000; --g1: #1a5c1a; --g2: #247a24; }
+
+:root { --y: #f5d000; --bg: #0a0a0a; }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background: #0a0a0a; color: #fff; font-family: 'Teko', sans-serif; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100vh; }
+body { background: var(--bg); color: #fff; font-family: 'Teko', sans-serif; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100vh; }
 
 .card { background: #151515; padding: 2rem; border-radius: 15px; border: 1px solid #333; width: 320px; text-align: center; box-shadow: 0 10px 40px #000; }
 h1 { font-family: 'Bebas Neue'; font-size: 4.5rem; color: var(--y); line-height: 0.9; margin-bottom: 1rem; }
 input { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px; font-size: 1.1rem; text-align: center; }
 .btn { width: 100%; padding: 12px; background: var(--y); border: none; border-radius: 5px; font-family: 'Bebas Neue'; font-size: 1.4rem; cursor: pointer; color: #000; }
 
-#game-ui { display: none; flex-direction: column; align-items: center; position: relative; }
-.sb { width: 780px; display: flex; justify-content: space-between; padding: 10px 20px; background: #111; border: 2px solid #333; border-radius: 10px 10px 0 0; font-size: 1.5rem; }
-canvas { background: var(--g1); border: 5px solid #222; border-radius: 0 0 10px 10px; }
-#goal-txt { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Bebas Neue'; font-size: 7rem; color: var(--y); display: none; text-shadow: 4px 4px 0 #000; z-index: 10; pointer-events: none; }
+#game-ui { display: none; flex-direction: column; align-items: center; }
+.sb { width: 800px; display: flex; justify-content: space-around; padding: 10px; font-family: 'Bebas Neue'; font-size: 4rem; color: #fff; }
+canvas { background: #000; border: 4px solid #333; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
 </style>
 </head>
 <body>
 
 <div id="lobby">
   <div class="card" id="step1">
-    <h1>FUTLOCO</h1>
+    <h1>PINGPONG</h1>
     <input type="text" id="nick" placeholder="SEU NICK" maxlength="10">
-    <button class="btn" onclick="start()">JOGAR AGORA</button>
+    <button class="btn" onclick="start()">ENTRAR</button>
   </div>
   <div class="card" id="step2" style="display:none">
     <button class="btn" onclick="create()">CRIAR SALA</button>
@@ -37,24 +37,25 @@ canvas { background: var(--g1); border: 5px solid #222; border-radius: 0 0 10px 
   <div class="card" id="step-wait" style="display:none">
     <p>CÓDIGO:</p>
     <h2 id="room-code-dis" style="font-size:3rem; color:var(--y)">----</h2>
-    <p>AGUARDANDO OPONENTE...</p>
+    <p>AGUARDANDO...</p>
   </div>
 </div>
 
 <div id="game-ui">
   <div class="sb">
-    <span id="n1">P1</span>
-    <span id="score" style="color:var(--y); font-weight:bold">0 - 0</span>
-    <span id="n2">P2</span>
+    <span id="s1">0</span>
+    <span style="color:var(--y)">-</span>
+    <span id="s2">0</span>
   </div>
   <canvas id="gc"></canvas>
-  <div id="goal-txt">GOOOOL!</div>
+  <p style="margin-top:10px; color:#555">W / S ou SETAS para mover</p>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+// Mantenha sua configuração do Firebase aqui
 const firebaseConfig = {
   apiKey: "AIzaSyA2errhulZq6uaSnu9ax4jzIqpKvKX8phA",
   authDomain: "futebol-7df3e.firebaseapp.com",
@@ -65,182 +66,95 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const W = 780, H = 440;
-let myRole = '', roomCode = '', myNick = '', frameCount = 0;
+const W = 800, H = 500;
+let myRole = '', roomCode = '', frameCount = 0;
 const cv = document.getElementById('gc'), ctx = cv.getContext('2d');
 cv.width = W; cv.height = H;
 
 const state = {
-  p1: { x: 150, y: 220, r: 18, s: 0, nick: '' },
-  p2: { x: 630, y: 220, r: 18, s: 0, nick: '' },
-  ball: { x: 390, y: 220, vx: 0, vy: 0, r: 10 },
-  goal: false
+  p1: { y: 200, h: 80, w: 15, s: 0 },
+  p2: { y: 200, h: 80, w: 15, s: 0 },
+  ball: { x: 400, y: 250, vx: 0, vy: 0, r: 8 },
+  active: false
 };
 
 const keys = {};
-const p1In = { u:0, d:0, l:0, r:0, s:0 };
-const p2In = { u:0, d:0, l:0, r:0, s:0 };
 
 window.start = () => {
-  myNick = document.getElementById('nick').value || 'PLAYER';
   document.getElementById('step1').style.display = 'none';
   document.getElementById('step2').style.display = 'block';
 };
 
 window.create = async () => {
   roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-  myRole = 'p1'; state.p1.nick = myNick;
-  await set(ref(db, `f/${roomCode}`), { state, p1In, p2In });
+  myRole = 'p1';
+  resetBall(); // Sorteia direção inicial
+  await set(ref(db, `pp/${roomCode}`), { state, p1y: 200, p2y: 200 });
+  
   document.getElementById('step2').style.display = 'none';
   document.getElementById('step-wait').style.display = 'block';
   document.getElementById('room-code-dis').textContent = roomCode;
-  onValue(ref(db, `f/${roomCode}/p2In`), s => { if(s.val()) Object.assign(p2In, s.val()); });
-  onValue(ref(db, `f/${roomCode}/p2N`), s => { if(s.val()) { state.p2.nick = s.val(); run(); }});
+  
+  onValue(ref(db, `pp/${roomCode}/p2y`), s => { if(s.val() !== undefined) state.p2.y = s.val(); });
+  onValue(ref(db, `pp/${roomCode}/p2Join`), s => { if(s.val()) run(); });
 };
 
 window.join = async () => {
   roomCode = document.getElementById('room-in').value.toUpperCase();
-  myRole = 'p2'; state.p2.nick = myNick;
-  update(ref(db, `f/${roomCode}`), { p2N: myNick });
-  onValue(ref(db, `f/${roomCode}/p1In`), s => { if(s.val()) Object.assign(p1In, s.val()); });
-  onValue(ref(db, `f/${roomCode}/state`), s => { if(s.val()) Object.assign(state, s.val()); });
+  myRole = 'p2';
+  update(ref(db, `pp/${roomCode}`), { p2Join: true });
+  onValue(ref(db, `pp/${roomCode}/p1y`), s => { if(s.val() !== undefined) state.p1.y = s.val(); });
+  onValue(ref(db, `pp/${roomCode}/state`), s => { if(s.val()) Object.assign(state, s.val()); });
   run();
 };
 
+function resetBall() {
+  state.ball.x = W / 2;
+  state.ball.y = H / 2;
+  // 50% de chance para cada lado
+  const dir = Math.random() < 0.5 ? -1 : 1;
+  state.ball.vx = dir * 7;
+  state.ball.vy = (Math.random() - 0.5) * 8;
+  state.active = true;
+}
+
 function physics() {
-  if (myRole !== 'p1' || state.goal) return;
+  if (myRole !== 'p1') return;
 
-  const move = (p, inv) => {
-    const spd = inv.s ? 4.5 : 2.8; // Velocidade reduzida
-    if (inv.u) p.y -= spd; if (inv.d) p.y += spd;
-    if (inv.l) p.x -= spd; if (inv.r) p.x += spd;
-    // Barreira física para jogadores
-    p.x = Math.max(p.r + 5, Math.min(W - p.r - 5, p.x));
-    p.y = Math.max(p.r + 5, Math.min(H - p.r - 5, p.y));
-  };
-
-  move(state.p1, p1In);
-  move(state.p2, p2In);
-
-  // Atrito da bola (maior para ser mais lento)
+  // Movimento da bola
   state.ball.x += state.ball.vx;
   state.ball.y += state.ball.vy;
-  state.ball.vx *= 0.965; state.ball.vy *= 0.965;
 
-  const goalY = (H-120)/2;
-  const bounce = 0.7; // Perda de energia ao bater na borda
+  // Colisão Teto/Chão
+  if (state.ball.y < 0 || state.ball.y > H) state.ball.vy *= -1;
 
-  // Colisão Topo/Fundo
-  if (state.ball.y < state.ball.r + 5 || state.ball.y > H - state.ball.r - 5) {
-    state.ball.vy *= -bounce;
-    state.ball.y = state.ball.y < H/2 ? state.ball.r + 6 : H - state.ball.r - 6;
-  }
-  
-  // Colisão Laterais e Gols
-  if (state.ball.x < state.ball.r + 5 || state.ball.x > W - state.ball.r - 5) {
-    if (state.ball.y > goalY && state.ball.y < goalY + 120) {
-       // Dentro do Gol
-       if(state.ball.x < -15 || state.ball.x > W + 15) score(state.ball.x < W/2 ? 'p2' : 'p1');
-    } else {
-       // Bateu na parede lateral
-       state.ball.vx *= -bounce;
-       state.ball.x = state.ball.x < W/2 ? state.ball.r + 6 : W - state.ball.r - 6;
+  // Colisão Raquetes
+  const checkPaddle = (p, isLeft) => {
+    const px = isLeft ? 20 : W - 20 - p.w;
+    if (state.ball.x > px && state.ball.x < px + p.w &&
+        state.ball.y > p.y && state.ball.y < p.y + p.h) {
+      
+      // Aumenta velocidade gradualmente
+      state.ball.vx *= -1.05; 
+      // Adiciona "efeito" dependendo de onde bateu na raquete
+      const hitPos = (state.ball.y - (p.y + p.h/2)) / (p.h/2);
+      state.ball.vy = hitPos * 7;
+      
+      // Reposiciona para evitar prender a bola
+      state.ball.x = isLeft ? px + p.w + 5 : px - 5;
     }
-  }
-
-  // Colisão Jogador x Bola (Física de impacto)
-  [state.p1, state.p2].forEach(p => {
-    const dx = state.ball.x - p.x, dy = state.ball.y - p.y;
-    const dist = Math.hypot(dx, dy);
-    if (dist < p.r + state.ball.r) {
-      const angle = Math.atan2(dy, dx);
-      const power = 7.5; // Força do chute reduzida
-      state.ball.vx = Math.cos(angle) * power;
-      state.ball.vy = Math.sin(angle) * power;
-      // Impede sobreposição
-      state.ball.x = p.x + Math.cos(angle) * (p.r + state.ball.r + 1);
-      state.ball.y = p.y + Math.sin(angle) * (p.r + state.ball.r + 1);
-    }
-  });
-
-  if (frameCount % 3 === 0) update(ref(db, `f/${roomCode}/state`), state);
-}
-
-function score(w) {
-  state.goal = true; state[w].s++;
-  document.getElementById('goal-txt').style.display = 'block';
-  setTimeout(() => {
-    state.ball = { x: 390, y: 220, vx: 0, vy: 0, r: 10 };
-    state.p1.x = 150; state.p1.y = 220;
-    state.p2.x = 630; state.p2.y = 220;
-    state.goal = false;
-    document.getElementById('goal-txt').style.display = 'none';
-  }, 1500);
-}
-
-function loop() {
-  frameCount++;
-  const myIn = {
-    u: keys['KeyW'] || keys['ArrowUp'] ? 1:0,
-    d: keys['KeyS'] || keys['ArrowDown'] ? 1:0,
-    l: keys['KeyA'] || keys['ArrowLeft'] ? 1:0,
-    r: keys['KeyD'] || keys['ArrowRight'] ? 1:0,
-    s: keys['ShiftLeft'] || keys['ShiftRight'] ? 1:0
   };
-  
-  if (frameCount % 2 === 0) update(ref(db, `f/${roomCode}/${myRole}In`), myIn);
 
-  if(myRole === 'p1') { Object.assign(p1In, myIn); physics(); } 
-  else { Object.assign(p2In, myIn); }
+  checkPaddle(state.p1, true);
+  checkPaddle(state.p2, false);
 
-  draw();
-  requestAnimationFrame(loop);
-}
+  // Pontuação (Fundo da quadra)
+  if (state.ball.x < 0) { state.p2.s++; resetBall(); }
+  if (state.ball.x > W) { state.p1.s++; resetBall(); }
 
-function draw() {
-  // Gramado
-  for(let i=0; i<W; i+=60) {
-    ctx.fillStyle = (i/60)%2==0 ? '#1e6b1e' : '#247a24';
-    ctx.fillRect(i, 0, 60, H);
+  if (frameCount % 3 === 0) {
+    update(ref(db, `pp/${roomCode}/state`), state);
   }
-  
-  // Linhas e Barreiras Visuais
-  ctx.strokeStyle = "rgba(255,255,255,0.25)"; ctx.lineWidth = 3;
-  ctx.strokeRect(5, 5, W-10, H-10); // Borda externa
-  ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
-  ctx.beginPath(); ctx.arc(W/2, H/2, 50, 0, Math.PI*2); ctx.stroke();
-
-  // Gols
-  const goalY = (H-120)/2;
-  ctx.fillStyle = "#111";
-  ctx.fillRect(0, goalY, 12, 120);
-  ctx.fillRect(W-12, goalY, 12, 120);
-  ctx.strokeStyle = var(--y); ctx.lineWidth = 2;
-  ctx.strokeRect(0, goalY, 12, 120);
-  ctx.strokeRect(W-12, goalY, 12, 120);
-
-  // Bola com Sombra
-  ctx.fillStyle = "rgba(0,0,0,0.3)";
-  ctx.beginPath(); ctx.arc(state.ball.x+3, state.ball.y+3, 10, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = "#fff"; ctx.beginPath();
-  ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI*2); ctx.fill();
-
-  // Players
-  drawP(state.p1, '#e84040');
-  drawP(state.p2, '#3a6fe8');
-  
-  document.getElementById('score').textContent = `${state.p1.s} - ${state.p2.s}`;
-  document.getElementById('n1').textContent = state.p1.nick;
-  document.getElementById('n2').textContent = state.p2.nick;
-}
-
-function drawP(p, c) {
-  ctx.fillStyle = "rgba(0,0,0,0.3)";
-  ctx.beginPath(); ctx.arc(p.x+3, p.y+3, p.r, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = c; ctx.beginPath();
-  ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
-  ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke();
-  ctx.fillStyle = "#fff"; ctx.font = "14px Arial"; ctx.fillText(p.nick, p.x-15, p.y-25);
 }
 
 function run() {
@@ -249,6 +163,52 @@ function run() {
   window.addEventListener('keydown', e => keys[e.code] = true);
   window.addEventListener('keyup', e => keys[e.code] = false);
   requestAnimationFrame(loop);
+}
+
+function loop() {
+  frameCount++;
+  
+  // Movimento local da raquete
+  let move = 0;
+  if (keys['KeyW'] || keys['ArrowUp']) move = -8;
+  if (keys['KeyS'] || keys['ArrowDown']) move = 8;
+
+  if (myRole === 'p1') {
+    state.p1.y = Math.max(0, Math.min(H - state.p1.h, state.p1.y + move));
+    update(ref(db, `pp/${roomCode}/p1y`), state.p1.y);
+    physics();
+  } else {
+    state.p2.y = Math.max(0, Math.min(H - state.p2.h, state.p2.y + move));
+    update(ref(db, `pp/${roomCode}/p2y`), state.p2.y);
+  }
+
+  draw();
+  requestAnimationFrame(loop);
+}
+
+function draw() {
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, W, H);
+
+  // Rede Central
+  ctx.strokeStyle = "rgba(255,255,255,0.2)";
+  ctx.setLineDash([10, 10]);
+  ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Raquetes
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(20, state.p1.y, state.p1.w, state.p1.h);
+  ctx.fillRect(W - 20 - state.p2.w, state.p2.y, state.p2.w, state.p2.h);
+
+  // Bola (Ping Pong)
+  ctx.beginPath();
+  ctx.arc(state.ball.x, state.ball.y, state.ball.r, 0, Math.PI*2);
+  ctx.fill();
+
+  // Placar
+  document.getElementById('s1').textContent = state.p1.s;
+  document.getElementById('s2').textContent = state.p2.s;
 }
 </script>
 </body>
