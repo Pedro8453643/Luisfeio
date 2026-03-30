@@ -10,6 +10,7 @@
 :root {
   --grass: #1e6b1e;
   --grass2: #1a5c1a;
+  --white: #f0f4e8;
   --yellow: #f5d000;
   --p1color: #e84040;
   --p2color: #3a6fe8;
@@ -21,7 +22,7 @@
 
 body {
   background: #0a0a0a;
-  color: #f0f4e8;
+  color: var(--white);
   font-family: 'Teko', sans-serif;
   min-height: 100vh;
   display: flex;
@@ -37,23 +38,23 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
-  animation: fadeIn 0.6s ease;
+  gap: 1.8rem;
+  animation: fadeIn .6s ease;
 }
-@keyframes fadeIn { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:none} }
+@keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
 
 .logo-wrap { text-align: center; }
 .logo-wrap h1 {
   font-family: 'Bebas Neue', sans-serif;
   font-size: clamp(3.5rem, 12vw, 7rem);
   color: var(--yellow);
-  letter-spacing: 0.1em;
-  text-shadow: 6px 6px 0 #a38a00, 0 0 60px rgba(245,208,0,0.6);
+  letter-spacing: .1em;
+  text-shadow: 6px 6px 0 #a38a00, 0 0 60px rgba(245,208,0,.6);
 }
 .logo-wrap .tagline {
   font-size: 1.3rem;
   color: #aaa;
-  letter-spacing: 0.35em;
+  letter-spacing: .35em;
   text-transform: uppercase;
   margin-top: -12px;
 }
@@ -65,6 +66,8 @@ body {
   padding: 2rem 2.5rem;
   width: min(400px, 94vw);
   box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+  position: relative;
+  overflow: hidden;
 }
 .card::before {
   content: '';
@@ -77,7 +80,7 @@ body {
 .card-title {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1.6rem;
-  letter-spacing: 0.15em;
+  letter-spacing: .15em;
   color: #ccc;
   margin-bottom: 1.5rem;
   text-align: center;
@@ -86,41 +89,38 @@ body {
 .field-group { margin-bottom: 1.5rem; }
 .field-group label {
   display: block;
-  font-size: 0.95rem;
+  font-size: .95rem;
   color: #aaa;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.5rem;
+  letter-spacing: .1em;
+  margin-bottom: .5rem;
 }
 .field-group input {
   width: 100%;
   background: #111;
   border: 2px solid #444;
   border-radius: 10px;
-  color: white;
+  color: #fff;
   font-family: 'Teko', sans-serif;
   font-size: 1.4rem;
-  padding: 0.8rem 1rem;
+  padding: .8rem 1rem;
   outline: none;
-  transition: all 0.2s;
+  transition: all .2s;
 }
-.field-group input:focus {
-  border-color: var(--yellow);
-  box-shadow: 0 0 0 4px rgba(245,208,0,0.25);
-}
+.field-group input:focus { border-color: var(--yellow); box-shadow: 0 0 0 4px rgba(245,208,0,.25); }
 
 .color-pick {
   display: flex;
-  gap: 0.8rem;
+  gap: .8rem;
   flex-wrap: wrap;
-  margin-top: 0.5rem;
+  margin-top: .5rem;
 }
 .color-swatch {
   width: 38px; height: 38px;
   border-radius: 50%;
   border: 3px solid transparent;
   cursor: pointer;
-  transition: all 0.25s;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: all .25s;
+  box-shadow: 0 4px 12px rgba(0,0,0,.5);
 }
 .color-swatch.active,
 .color-swatch:hover {
@@ -136,18 +136,15 @@ body {
   color: #111;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1.6rem;
-  letter-spacing: 0.15em;
+  letter-spacing: .15em;
   padding: 1rem;
   cursor: pointer;
   font-weight: 700;
-  transition: all 0.2s;
-  margin-top: 0.5rem;
+  transition: all .2s;
+  margin-top: .5rem;
 }
-.btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(245,208,0,0.5);
-}
-.btn:active { transform: scale(0.96); }
+.btn:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(245,208,0,.5); }
+.btn:active { transform: scale(.96); }
 
 /* GAME */
 #game { display: none; flex-direction: column; align-items: center; width: 100vw; }
@@ -156,9 +153,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: min(820px, 98vw);
-  padding: 0.8rem 1.5rem;
-  background: rgba(10,10,10,0.95);
+  width: min(780px, 98vw);
+  padding: .8rem 1.5rem;
+  background: rgba(10,10,10,.95);
   border-bottom: 4px solid #222;
   backdrop-filter: blur(10px);
 }
@@ -166,7 +163,7 @@ body {
 .sb-player {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: .8rem;
   font-size: 1.5rem;
   font-weight: 700;
 }
@@ -181,7 +178,7 @@ body {
 .sb-score {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 3.4rem;
-  letter-spacing: 0.2em;
+  letter-spacing: .2em;
   color: var(--yellow);
 }
 
@@ -193,8 +190,8 @@ body {
 
 #canvas-wrap {
   position: relative;
-  width: min(820px, 98vw);
-  box-shadow: 0 0 50px rgba(0,0,0,0.85);
+  width: min(780px, 98vw);
+  box-shadow: 0 0 50px rgba(0,0,0,.85);
 }
 
 canvas#gc {
@@ -205,47 +202,46 @@ canvas#gc {
   border-radius: 10px;
 }
 
-/* Boost Indicator */
+/* BOOST INDICATOR (SHIFT) */
 #boost-indicator {
   position: absolute;
-  top: 20px;
+  top: 18px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(245, 208, 0, 0.95);
+  background: rgba(245,208,0,.95);
   color: #111;
-  padding: 6px 20px;
+  padding: 6px 22px;
   border-radius: 30px;
   font-size: 1rem;
   font-weight: bold;
   display: none;
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(245,208,0,0.6);
-  letter-spacing: 0.05em;
+  box-shadow: 0 4px 20px rgba(245,208,0,.6);
+  letter-spacing: .05em;
 }
 
-/* Controls Hint */
+/* CONTROLS */
 .controls-hint {
-  width: min(820px, 98vw);
-  padding: 0.8rem 1.5rem;
+  width: min(780px,98vw);
+  padding: .8rem 1.5rem;
   background: #111;
-  color: #888;
   font-size: 1.05rem;
+  color: #888;
   display: flex;
   justify-content: space-between;
   border-top: 2px solid #222;
 }
 
+/* MOBILE */
 #mobile-controls {
   display: none;
-  width: min(820px, 98vw);
+  width: min(780px,98vw);
   padding: 1rem;
   background: #0a0a0a;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
-@media (max-width: 700px) {
-  #mobile-controls { display: flex; }
-}
+@media (max-width: 700px) { #mobile-controls { display: flex; } }
 .mob-btn {
   flex: 1;
   background: #222;
@@ -253,13 +249,13 @@ canvas#gc {
   border-radius: 12px;
   color: #ddd;
   font-size: 1.5rem;
-  padding: 1.1rem 0.5rem;
+  padding: 1.1rem .5rem;
   cursor: pointer;
 }
-.mob-btn:active { background: #444; transform: scale(0.95); }
+.mob-btn:active { background: #444; transform: scale(.95); }
 #mb-kick { flex: 1.8; background: #3a2a00; border-color: #f5d000; color: #f5d000; }
 
-/* Goal & Result */
+/* OVERLAYS */
 #goal-overlay {
   position: absolute;
   inset: 0;
@@ -267,20 +263,21 @@ canvas#gc {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background: rgba(0,0,0,0.75);
+  background: rgba(0,0,0,.75);
   z-index: 50;
-  animation: goalPop 0.4s ease;
+  animation: goalPop .4s ease;
 }
+@keyframes goalPop { from{transform:scale(.6);opacity:0} to{transform:scale(1);opacity:1} }
 .goal-text {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 5.5rem;
   color: var(--yellow);
-  text-shadow: 0 0 40px rgba(245,208,0,0.9);
+  text-shadow: 0 0 40px rgba(245,208,0,.9);
 }
 #result-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.96);
+  background: rgba(0,0,0,.96);
   display: none;
   align-items: center;
   justify-content: center;
@@ -292,6 +289,10 @@ canvas#gc {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 4.5rem;
   text-align: center;
+}
+.result-score {
+  font-size: 3.8rem;
+  color: #ddd;
 }
 .result-btn {
   background: var(--yellow);
@@ -307,6 +308,7 @@ canvas#gc {
 </head>
 <body>
 
+<!-- LOBBY -->
 <div id="lobby">
   <div class="logo-wrap">
     <h1>FUTLOCO</h1>
@@ -338,22 +340,24 @@ canvas#gc {
   <div class="card" id="cj-card" style="display:none">
     <p class="card-title">// CRIAR OU ENTRAR</p>
     <button class="btn" id="btn-create">⊕ CRIAR SALA</button>
-    <div style="text-align:center; margin:1.2rem 0; color:#555; font-size:1.1rem;">OU</div>
+    <div style="text-align:center;margin:1.2rem 0;color:#555;font-size:1.1rem;">OU</div>
     <div class="field-group">
       <label>CÓDIGO DA SALA</label>
-      <input type="text" id="inp-code" placeholder="XXXX" maxlength="4" style="text-align:center; font-size:2.4rem; letter-spacing:0.6em; text-transform:uppercase"/>
+      <input type="text" id="inp-code" placeholder="XXXX" maxlength="4" style="text-align:center;font-size:2.4rem;letter-spacing:0.6em;text-transform:uppercase"/>
     </div>
-    <button class="btn" id="btn-join" style="background:#444; color:white;">ENTRAR NA SALA</button>
+    <button class="btn" id="btn-join" style="background:#444;color:white;">ENTRAR NA SALA</button>
+    <p class="error-msg" id="cj-err"></p>
   </div>
 
   <div class="card" id="wait-card" style="display:none">
     <p class="card-title">// AGUARDANDO AMIGO</p>
-    <div class="big-room-code" id="disp-code" style="font-size:4.5rem; letter-spacing:0.6em; color:var(--yellow); margin:1rem 0;">----</div>
+    <div class="big-room-code" id="disp-code" style="font-size:4.5rem;letter-spacing:0.6em;color:var(--yellow);margin:1rem 0;">----</div>
     <button class="btn" id="btn-copy">📋 COPIAR CÓDIGO</button>
-    <p style="text-align:center; margin-top:1rem; color:#777;">Envie este código para seu amigo!</p>
+    <p style="text-align:center;margin-top:1rem;color:#777;">Envie este código para seu amigo!</p>
   </div>
 </div>
 
+<!-- GAME -->
 <div id="game">
   <div class="scoreboard">
     <div class="sb-player p1">
@@ -371,11 +375,11 @@ canvas#gc {
   </div>
 
   <div id="canvas-wrap">
-    <canvas id="gc" width="820" height="460"></canvas>
+    <canvas id="gc"></canvas>
     <div id="boost-indicator">SHIFT • SPRINT ATIVADO</div>
     <div id="goal-overlay">
       <div class="goal-text">GOOOOL!</div>
-      <div id="goal-scorer" style="font-size:1.8rem; color:#ddd; margin-top:10px;"></div>
+      <div id="goal-scorer" style="font-size:1.8rem;color:#ddd;margin-top:10px;"></div>
     </div>
   </div>
 
@@ -395,9 +399,11 @@ canvas#gc {
 
 <div id="result-overlay">
   <div class="result-winner" id="res-winner">---</div>
-  <div class="result-score" id="res-score" style="font-size:3.8rem; color:#ddd;">0 — 0</div>
+  <div class="result-score" id="res-score">0 — 0</div>
   <button class="result-btn" onclick="location.reload()">↺ JOGAR NOVAMENTE</button>
 </div>
+
+<div id="notif"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -416,22 +422,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const CANVAS_W = 820;
-const CANVAS_H = 460;
+// ────────────────────────────────────────────
+// CONFIGURAÇÕES DO JOGO
+// ────────────────────────────────────────────
+const CANVAS_W = 780;
+const CANVAS_H = 440;
 const GAME_DURATION = 180;
 
 let myRole = null;
 let roomCode = '';
-let myName = "JOGADOR";
-let myColor = "#e84040";
+let myName = '';
+let myColor = '#e84040';
 
 const phys = {
-  p1: { x: 160, y: CANVAS_H/2, vx:0, vy:0, r:20, score:0, name:'P1', color:'#e84040' },
-  p2: { x: CANVAS_W-160, y: CANVAS_H/2, vx:0, vy:0, r:20, score:0, name:'P2', color:'#3a6fe8' },
-  ball: { x: CANVAS_W/2, y: CANVAS_H/2, vx:0, vy:0, r:13 },
+  p1: { x: 140, y: CANVAS_H/2, vx:0, vy:0, r:19, score:0, name:'P1', color:'#e84040', kick:false },
+  p2: { x: CANVAS_W-140, y: CANVAS_H/2, vx:0, vy:0, r:19, score:0, name:'P2', color:'#3a6fe8', kick:false },
+  ball: { x: CANVAS_W/2, y: CANVAS_H/2, vx:0, vy:0, r:12 },
   time: GAME_DURATION,
   phase: 'playing',
-  lastGoal: null
+  lastGoal: null,
+  tick: 0
 };
 
 const myInput = { left:false, right:false, up:false, down:false, kick:false, sprint:false };
@@ -440,86 +450,56 @@ let canvas, ctx;
 let lastTs = 0;
 let inputBroadcastTimer = 0;
 
-// ====================== SETUP ======================
-function startGame() {
-  document.getElementById('lobby').style.display = 'none';
-  document.getElementById('game').style.display = 'flex';
-
-  canvas = document.getElementById('gc');
-  canvas.width = CANVAS_W;
-  canvas.height = CANVAS_H;
-  ctx = canvas.getContext('2d');
-
-  setupInput();
-  setupMobileButtons();
-  updateSB();
-
-  if (myRole === 'p1') {
-    gameLoop();
-  } else {
-    gameLoopP2();
-  }
-}
-
-// ====================== INPUT ======================
-function setupInput() {
-  const isP1 = myRole === 'p1';
-
-  window.addEventListener('keydown', e => {
-    if (isP1) {
-      if (e.code === 'KeyA' || e.code === 'ArrowLeft') myInput.left = true;
-      if (e.code === 'KeyD' || e.code === 'ArrowRight') myInput.right = true;
-      if (e.code === 'KeyW' || e.code === 'ArrowUp') myInput.up = true;
-      if (e.code === 'KeyS' || e.code === 'ArrowDown') myInput.down = true;
-    } else {
-      if (e.code === 'KeyA' || e.code === 'ArrowLeft') myInput.left = true;
-      if (e.code === 'KeyD' || e.code === 'ArrowRight') myInput.right = true;
-      if (e.code === 'KeyW' || e.code === 'ArrowUp') myInput.up = true;
-      if (e.code === 'KeyS' || e.code === 'ArrowDown') myInput.down = true;
-    }
-
-    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') myInput.sprint = true;
-    if (e.code === 'Space' || e.code === 'Enter') myInput.kick = true;
-  });
-
-  window.addEventListener('keyup', e => {
-    if (['KeyA','ArrowLeft'].includes(e.code)) myInput.left = false;
-    if (['KeyD','ArrowRight'].includes(e.code)) myInput.right = false;
-    if (['KeyW','ArrowUp'].includes(e.code)) myInput.up = false;
-    if (['KeyS','ArrowDown'].includes(e.code)) myInput.down = false;
-    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') myInput.sprint = false;
-    if (e.code === 'Space' || e.code === 'Enter') myInput.kick = false;
-  });
-}
-
-function setupMobileButtons() {
-  const actions = {
-    'mb-left': () => myInput.left = true,
-    'mb-right': () => myInput.right = true,
-    'mb-up': () => myInput.up = true,
-    'mb-down': () => myInput.down = true,
-    'mb-kick': () => myInput.kick = true
-  };
-
-  Object.keys(actions).forEach(id => {
-    const btn = document.getElementById(id);
-    btn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      actions[id]();
-    });
-    btn.addEventListener('touchend', () => {
-      myInput.left = myInput.right = myInput.up = myInput.down = false;
-      if (id === 'mb-kick') myInput.kick = false;
-    });
-  });
-}
-
-// ====================== PHYSICS (MELHORADA) ======================
+// ────────────────────────────────────────────
+// FÍSICA MELHORADA + SPRINT (SHIFT)
+// ────────────────────────────────────────────
 const BASE_SPEED = 265;
 const SPRINT_SPEED = 465;
-const FRICTION = 0.81;
+const PLAYER_FRICTION = 0.81;
 const BALL_FRICTION = 0.976;
 const KICK_FORCE = 520;
+const GOAL_W = 12;
+const GOAL_H = 110;
+const GOAL_Y = (CANVAS_H - GOAL_H) / 2;
+
+function applyMovement(p, inp, speed, dt) {
+  let ax = 0, ay = 0;
+  if (inp.left) ax -= 1;
+  if (inp.right) ax += 1;
+  if (inp.up) ay -= 1;
+  if (inp.down) ay += 1;
+
+  if (ax !== 0 || ay !== 0) {
+    const len = Math.hypot(ax, ay);
+    ax /= len;
+    ay /= len;
+    p.vx += ax * speed * dt * 5.2;
+    p.vy += ay * speed * dt * 5.2;
+  }
+
+  p.x += p.vx * dt;
+  p.y += p.vy * dt;
+  p.vx *= PLAYER_FRICTION;
+  p.vy *= PLAYER_FRICTION;
+
+  // KICK
+  if (inp.kick) {
+    const ball = phys.ball;
+    const dx = ball.x - p.x;
+    const dy = ball.y - p.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    if (dist < p.r + ball.r + 28) {
+      const force = inp.sprint ? KICK_FORCE * 1.3 : KICK_FORCE;
+      ball.vx += (dx / dist) * force;
+      ball.vy += (dy / dist) * force;
+    }
+    inp.kick = false;
+  }
+
+  // Clamp
+  p.x = Math.max(p.r, Math.min(CANVAS_W - p.r, p.x));
+  p.y = Math.max(p.r, Math.min(CANVAS_H - p.r, p.y));
+}
 
 function updatePhysics(dt) {
   const p1 = phys.p1;
@@ -541,116 +521,148 @@ function updatePhysics(dt) {
   ball.vx *= BALL_FRICTION;
   ball.vy *= BALL_FRICTION;
 
-  // Wall & Goal logic (simplificado)
-  if (ball.y - ball.r < 0 || ball.y + ball.r > CANVAS_H) {
-    ball.y = Math.max(ball.r, Math.min(CANVAS_H - ball.r, ball.y));
-    ball.vy *= -0.75;
+  // Paredes verticais (cima/baixo)
+  if (ball.y - ball.r < 0) { ball.y = ball.r; ball.vy *= -0.7; }
+  if (ball.y + ball.r > CANVAS_H) { ball.y = CANVAS_H - ball.r; ball.vy *= -0.7; }
+
+  // GOLS
+  const inGoalY = (y) => y > GOAL_Y && y < GOAL_Y + GOAL_H;
+  if (ball.x - ball.r < GOAL_W) {
+    if (inGoalY(ball.y)) {
+      if (ball.x < -ball.r) { scoreGoal('p2'); return; }
+    } else {
+      ball.x = GOAL_W + ball.r; ball.vx *= -0.7;
+    }
+  }
+  if (ball.x + ball.r > CANVAS_W - GOAL_W) {
+    if (inGoalY(ball.y)) {
+      if (ball.x > CANVAS_W + ball.r) { scoreGoal('p1'); return; }
+    } else {
+      ball.x = CANVAS_W - GOAL_W - ball.r; ball.vx *= -0.7;
+    }
   }
 
-  // Simple goal detection
-  if (ball.x < 0) { scoreGoal('p2'); }
-  if (ball.x > CANVAS_W) { scoreGoal('p1'); }
-
-  // Player-Ball collision
+  // Colisão bola × jogador
   [p1, p2].forEach(p => {
     const dx = ball.x - p.x;
     const dy = ball.y - p.y;
     const dist = Math.hypot(dx, dy);
-    if (dist < p.r + ball.r + 5) {
+    if (dist < p.r + ball.r && dist > 0) {
       const nx = dx / dist;
       const ny = dy / dist;
-      ball.vx = nx * 380;
-      ball.vy = ny * 380;
+      ball.x = p.x + nx * (p.r + ball.r);
+      ball.y = p.y + ny * (p.r + ball.r);
+      const rel = (ball.vx - p.vx) * nx + (ball.vy - p.vy) * ny;
+      if (rel < 0) {
+        ball.vx -= rel * nx * 1.45;
+        ball.vy -= rel * ny * 1.45;
+      }
     }
   });
 
+  // Colisão jogador × jogador
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  const dist = Math.hypot(dx, dy);
+  if (dist < p1.r + p2.r && dist > 0) {
+    const nx = dx / dist;
+    const push = (p1.r + p2.r - dist) * 0.6;
+    p1.x -= nx * push;
+    p1.y -= nx * push * (dy/dx || 0);
+    p2.x += nx * push;
+    p2.y += nx * push * (dy/dx || 0);
+  }
+
   // Boost indicator
-  document.getElementById('boost-indicator').style.display = 
-    (myInput.sprint && (myRole === 'p1' || myInput.sprint)) ? 'block' : 'none';
+  const boostEl = document.getElementById('boost-indicator');
+  boostEl.style.display = myInput.sprint ? 'block' : 'none';
 }
 
-function applyMovement(p, inp, speed, dt) {
-  let ax = 0, ay = 0;
-  if (inp.left) ax -= 1;
-  if (inp.right) ax += 1;
-  if (inp.up) ay -= 1;
-  if (inp.down) ay += 1;
-
-  if (ax !== 0 || ay !== 0) {
-    const len = Math.hypot(ax, ay);
-    ax /= len;
-    ay /= len;
-    p.vx += ax * speed * dt * 5;
-    p.vy += ay * speed * dt * 5;
-  }
-
-  p.x += p.vx * dt;
-  p.y += p.vy * dt;
-
-  p.vx *= FRICTION;
-  p.vy *= FRICTION;
-
-  // Kick
-  if (inp.kick) {
-    const ball = phys.ball;
-    const dx = ball.x - p.x;
-    const dy = ball.y - p.y;
-    const dist = Math.hypot(dx, dy) || 1;
-    if (dist < 60) {
-      ball.vx += (dx / dist) * KICK_FORCE;
-      ball.vy += (dy / dist) * KICK_FORCE;
-    }
-    inp.kick = false;
-  }
-
-  // Clamp player
-  p.x = Math.max(p.r, Math.min(CANVAS_W - p.r, p.x));
-  p.y = Math.max(p.r, Math.min(CANVAS_H - p.r, p.y));
-}
-
+// ────────────────────────────────────────────
+// SCORING + GOAL
+// ────────────────────────────────────────────
 function scoreGoal(scorer) {
   phys[scorer].score++;
   phys.phase = 'goal';
-  document.getElementById('goal-scorer').textContent = phys[scorer].name + " MARCOU!";
-  document.getElementById('goal-overlay').style.display = 'flex';
+  phys.lastGoal = scorer;
+
+  const overlay = document.getElementById('goal-overlay');
+  document.getElementById('goal-scorer').textContent = (phys[scorer].name || scorer.toUpperCase()) + " MARCOU!";
+  overlay.style.display = 'flex';
+
+  broadcastState();
 
   setTimeout(() => {
-    document.getElementById('goal-overlay').style.display = 'none';
     resetPositions();
     phys.phase = 'playing';
-  }, 2000);
+    phys.lastGoal = null;
+    overlay.style.display = 'none';
+    broadcastState();
+  }, 2200);
 }
 
 function resetPositions() {
-  phys.p1.x = 160; phys.p1.y = CANVAS_H/2; phys.p1.vx = phys.p1.vy = 0;
-  phys.p2.x = CANVAS_W-160; phys.p2.y = CANVAS_H/2; phys.p2.vx = phys.p2.vy = 0;
+  phys.p1.x = 140; phys.p1.y = CANVAS_H/2; phys.p1.vx = phys.p1.vy = 0;
+  phys.p2.x = CANVAS_W-140; phys.p2.y = CANVAS_H/2; phys.p2.vx = phys.p2.vy = 0;
   phys.ball.x = CANVAS_W/2; phys.ball.y = CANVAS_H/2; phys.ball.vx = phys.ball.vy = 0;
 }
 
-// ====================== DRAW & LOOP ======================
+function endGame() {
+  phys.phase = 'ended';
+  broadcastState();
+  const ov = document.getElementById('result-overlay');
+  const winner = document.getElementById('res-winner');
+  const scoreEl = document.getElementById('res-score');
+
+  if (phys.p1.score > phys.p2.score) {
+    winner.innerHTML = `🏆 ${phys.p1.name} VENCEU!`;
+    winner.style.color = phys.p1.color;
+  } else if (phys.p2.score > phys.p1.score) {
+    winner.innerHTML = `🏆 ${phys.p2.name} VENCEU!`;
+    winner.style.color = phys.p2.color;
+  } else {
+    winner.textContent = '🤝 EMPATE!';
+    winner.style.color = '#f5d000';
+  }
+  scoreEl.textContent = `${phys.p1.score} — ${phys.p2.score}`;
+  ov.style.display = 'flex';
+}
+
+// ────────────────────────────────────────────
+// DRAW
+// ────────────────────────────────────────────
 function draw() {
   ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-  
-  // Campo
-  for (let i = 0; i < 12; i++) {
+
+  // Gramado
+  for (let i = 0; i < 13; i++) {
     ctx.fillStyle = i % 2 === 0 ? '#1e6b1e' : '#1a5c1a';
-    ctx.fillRect(i * (CANVAS_W/12), 0, CANVAS_W/12, CANVAS_H);
+    ctx.fillRect(i * (CANVAS_W/13), 0, CANVAS_W/13, CANVAS_H);
   }
 
   // Linhas do campo
-  ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+  ctx.strokeStyle = 'rgba(255,255,255,.35)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(GOAL_W+4, 4, CANVAS_W - GOAL_W*2 - 8, CANVAS_H-8);
+  ctx.beginPath(); ctx.moveTo(CANVAS_W/2, 0); ctx.lineTo(CANVAS_W/2, CANVAS_H); ctx.stroke();
+
+  // Gols
+  ctx.fillStyle = 'rgba(0,0,0,.4)';
+  ctx.fillRect(0, GOAL_Y, GOAL_W, GOAL_H);
+  ctx.fillRect(CANVAS_W - GOAL_W, GOAL_Y, GOAL_W, GOAL_H);
+  ctx.strokeStyle = '#fff';
   ctx.lineWidth = 4;
-  ctx.strokeRect(40, 40, CANVAS_W-80, CANVAS_H-80);
-  ctx.beginPath();
-  ctx.moveTo(CANVAS_W/2, 0);
-  ctx.lineTo(CANVAS_W/2, CANVAS_H);
-  ctx.stroke();
+  ctx.strokeRect(0, GOAL_Y, GOAL_W, GOAL_H);
+  ctx.strokeRect(CANVAS_W - GOAL_W, GOAL_Y, GOAL_W, GOAL_H);
 
   // Bola
+  ctx.shadowBlur = 12;
+  ctx.shadowColor = '#000';
   ctx.fillStyle = '#f5f5dc';
   ctx.beginPath();
   ctx.arc(phys.ball.x, phys.ball.y, phys.ball.r, 0, Math.PI*2);
   ctx.fill();
+  ctx.shadowBlur = 0;
 
   // Jogadores
   [phys.p1, phys.p2].forEach((p, i) => {
@@ -662,8 +674,209 @@ function draw() {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 18px Bebas Neue';
     ctx.textAlign = 'center';
-    ctx.fillText(i === 0 ? '1' : '2', p.x, p.y + 6);
+    ctx.textBaseline = 'middle';
+    ctx.fillText(i === 0 ? '1' : '2', p.x, p.y + 5);
   });
+}
+
+function updateSB() {
+  document.getElementById('sb-name1').textContent = phys.p1.name;
+  document.getElementById('sb-name2').textContent = phys.p2.name;
+  document.getElementById('dot-p1').style.background = phys.p1.color;
+  document.getElementById('dot-p2').style.background = phys.p2.color;
+  document.getElementById('sb-score').textContent = `${phys.p1.score} — ${phys.p2.score}`;
+
+  const t = Math.max(0, Math.ceil(phys.time));
+  const m = Math.floor(t / 60);
+  const s = t % 60;
+  document.getElementById('sb-time').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+// ────────────────────────────────────────────
+// INPUT
+// ────────────────────────────────────────────
+function setupInput() {
+  const isP1 = myRole === 'p1';
+
+  window.addEventListener('keydown', e => {
+    if (isP1) {
+      if (e.code === 'KeyA' || e.code === 'ArrowLeft') myInput.left = true;
+      if (e.code === 'KeyD' || e.code === 'ArrowRight') myInput.right = true;
+      if (e.code === 'KeyW' || e.code === 'ArrowUp') myInput.up = true;
+      if (e.code === 'KeyS' || e.code === 'ArrowDown') myInput.down = true;
+    } else {
+      if (e.code === 'KeyA' || e.code === 'ArrowLeft') myInput.left = true;
+      if (e.code === 'KeyD' || e.code === 'ArrowRight') myInput.right = true;
+      if (e.code === 'KeyW' || e.code === 'ArrowUp') myInput.up = true;
+      if (e.code === 'KeyS' || e.code === 'ArrowDown') myInput.down = true;
+    }
+    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') myInput.sprint = true;
+    if (e.code === 'Space' || e.code === 'Enter') myInput.kick = true;
+
+    if (['Space','ArrowUp','ArrowDown'].includes(e.code)) e.preventDefault();
+  });
+
+  window.addEventListener('keyup', e => {
+    if (['KeyA','ArrowLeft'].includes(e.code)) myInput.left = false;
+    if (['KeyD','ArrowRight'].includes(e.code)) myInput.right = false;
+    if (['KeyW','ArrowUp'].includes(e.code)) myInput.up = false;
+    if (['KeyS','ArrowDown'].includes(e.code)) myInput.down = false;
+    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') myInput.sprint = false;
+    if (e.code === 'Space' || e.code === 'Enter') myInput.kick = false;
+  });
+}
+
+function setupMobileButtons() {
+  const btns = {
+    'mb-left': () => myInput.left = true,
+    'mb-right': () => myInput.right = true,
+    'mb-up': () => myInput.up = true,
+    'mb-down': () => myInput.down = true,
+    'mb-kick': () => myInput.kick = true
+  };
+  Object.keys(btns).forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('touchstart', e => { e.preventDefault(); btns[id](); });
+    el.addEventListener('touchend', () => {
+      myInput.left = myInput.right = myInput.up = myInput.down = false;
+      if (id === 'mb-kick') myInput.kick = false;
+    });
+  });
+}
+
+// ────────────────────────────────────────────
+// LOBBY + FIREBASE
+// ────────────────────────────────────────────
+function showCreateJoin() {
+  myName = (document.getElementById('inp-name').value.trim().toUpperCase() || 'JOGADOR').slice(0,12);
+  document.getElementById('config-card').style.display = 'none';
+  document.getElementById('cj-card').style.display = 'block';
+}
+
+async function createRoom() {
+  const code = Math.random().toString(36).slice(2,6).toUpperCase();
+  roomCode = code;
+  myRole = 'p1';
+  phys.p1.name = myName;
+  phys.p1.color = myColor;
+
+  const btn = document.getElementById('btn-create');
+  btn.textContent = 'CONECTANDO...';
+  btn.disabled = true;
+
+  try {
+    await set(ref(db, `futloco/${code}`), {
+      p1: { name: myName, color: myColor, ready: true },
+      p2: null,
+      phase: 'waiting',
+      state: null,
+      p1input: null,
+      p2input: null
+    });
+  } catch(e) {
+    btn.textContent = '⊕ CRIAR SALA';
+    btn.disabled = false;
+    console.error(e);
+    return;
+  }
+
+  document.getElementById('cj-card').style.display = 'none';
+  document.getElementById('wait-card').style.display = 'block';
+  document.getElementById('disp-code').textContent = code;
+
+  let gameStarted = false;
+  onValue(ref(db, `futloco/${code}/p2`), snap => {
+    const p2data = snap.val();
+    if (p2data && p2data.name && !gameStarted) {
+      gameStarted = true;
+      phys.p2.name = p2data.name;
+      phys.p2.color = p2data.color || '#3a6fe8';
+      startGame();
+    }
+  });
+}
+
+async function joinRoom() {
+  const code = document.getElementById('inp-code').value.trim().toUpperCase();
+  if (code.length !== 4) return;
+
+  const btn = document.getElementById('btn-join');
+  btn.textContent = 'CONECTANDO...';
+  btn.disabled = true;
+
+  try {
+    const snap = await get(ref(db, `futloco/${code}`));
+    if (!snap.exists()) {
+      btn.textContent = 'ENTRAR NA SALA';
+      btn.disabled = false;
+      return;
+    }
+    const room = snap.val();
+    if (room.phase !== 'waiting') {
+      btn.textContent = 'ENTRAR NA SALA';
+      btn.disabled = false;
+      return;
+    }
+
+    roomCode = code;
+    myRole = 'p2';
+    phys.p1.name = room.p1.name;
+    phys.p1.color = room.p1.color;
+    phys.p2.name = myName;
+    phys.p2.color = myColor;
+
+    await update(ref(db, `futloco/${code}`), {
+      p2: { name: myName, color: myColor, ready: true },
+      phase: 'playing'
+    });
+  } catch(e) {
+    console.error(e);
+    btn.textContent = 'ENTRAR NA SALA';
+    btn.disabled = false;
+    return;
+  }
+
+  onValue(ref(db, `futloco/${roomCode}/state`), snap => {
+    const st = snap.val();
+    if (st && myRole === 'p2') applyServerState(st);
+  });
+
+  startGame();
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(roomCode);
+  const notif = document.getElementById('notif');
+  notif.textContent = 'CÓDIGO COPIADO!';
+  notif.style.display = 'block';
+  setTimeout(() => notif.style.display = 'none', 2000);
+}
+
+// ────────────────────────────────────────────
+// GAME START + LOOPS
+// ────────────────────────────────────────────
+function startGame() {
+  document.getElementById('lobby').style.display = 'none';
+  document.getElementById('game').style.display = 'flex';
+
+  canvas = document.getElementById('gc');
+  canvas.width = CANVAS_W;
+  canvas.height = CANVAS_H;
+  ctx = canvas.getContext('2d');
+
+  updateSB();
+  setupInput();
+  setupMobileButtons();
+
+  if (myRole === 'p1') {
+    onValue(ref(db, `futloco/${roomCode}/p2input`), snap => {
+      const inp = snap.val();
+      if (inp) phys.p2._remoteInput = inp;
+    });
+    gameLoop();
+  } else {
+    gameLoopP2();
+  }
 }
 
 function gameLoop(ts = 0) {
@@ -673,74 +886,76 @@ function gameLoop(ts = 0) {
   if (phys.phase === 'playing') {
     updatePhysics(dt);
     phys.time = Math.max(0, phys.time - dt);
-    if (phys.time <= 0) {
-      phys.phase = 'ended';
-      document.getElementById('result-overlay').style.display = 'flex';
-    }
+    if (phys.time <= 0) endGame();
   }
 
   draw();
   updateSB();
 
+  inputBroadcastTimer += dt;
+  if (inputBroadcastTimer > 0.05) {
+    inputBroadcastTimer = 0;
+    broadcastState();
+    update(ref(db, `futloco/${roomCode}/p1input`), { ...myInput, ts: Date.now() });
+  }
+
   requestAnimationFrame(gameLoop);
 }
 
-function gameLoopP2() {
+function gameLoopP2(ts = 0) {
+  const dt = Math.min((ts - lastTs) / 1000, 0.05);
+  lastTs = ts;
+
   draw();
   updateSB();
+
+  inputBroadcastTimer += dt;
+  if (inputBroadcastTimer > 0.05) {
+    inputBroadcastTimer = 0;
+    update(ref(db, `futloco/${roomCode}/p2input`), { ...myInput, ts: Date.now() });
+  }
+
   requestAnimationFrame(gameLoopP2);
 }
 
-function updateSB() {
-  document.getElementById('sb-name1').textContent = phys.p1.name;
-  document.getElementById('sb-name2').textContent = phys.p2.name;
-  document.getElementById('dot-p1').style.background = phys.p1.color;
-  document.getElementById('dot-p2').style.background = phys.p2.color;
-  document.getElementById('sb-score').textContent = phys.p1.score + " — " + phys.p2.score;
-
-  const m = Math.floor(phys.time / 60);
-  const s = Math.floor(phys.time % 60);
-  document.getElementById('sb-time').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+function applyServerState(st) {
+  if (!st) return;
+  phys.p1.x = st.p1x; phys.p1.y = st.p1y;
+  phys.p2.x = st.p2x; phys.p2.y = st.p2y;
+  phys.ball.x = st.bx; phys.ball.y = st.by;
+  phys.p1.score = st.s1; phys.p2.score = st.s2;
+  phys.time = st.time;
+  phys.phase = st.phase || 'playing';
+  if (st.phase === 'ended') endGame();
 }
 
-// ====================== LOBBY ======================
-document.getElementById('btn-play').onclick = () => {
-  myName = document.getElementById('inp-name').value.trim().toUpperCase() || "JOGADOR";
-  document.getElementById('config-card').style.display = 'none';
-  document.getElementById('cj-card').style.display = 'block';
-};
+function broadcastState() {
+  update(ref(db, `futloco/${roomCode}/state`), {
+    p1x: phys.p1.x, p1y: phys.p1.y,
+    p2x: phys.p2.x, p2y: phys.p2.y,
+    bx: phys.ball.x, by: phys.ball.y,
+    s1: phys.p1.score, s2: phys.p2.score,
+    time: phys.time,
+    phase: phys.phase,
+    ts: Date.now()
+  });
+}
 
-document.getElementById('color-pick').onclick = (e) => {
+// ────────────────────────────────────────────
+// BOTÕES
+// ────────────────────────────────────────────
+document.getElementById('btn-play').addEventListener('click', showCreateJoin);
+document.getElementById('btn-create').addEventListener('click', createRoom);
+document.getElementById('btn-join').addEventListener('click', joinRoom);
+document.getElementById('btn-copy').addEventListener('click', copyCode);
+
+document.getElementById('color-pick').addEventListener('click', e => {
   const sw = e.target.closest('.color-swatch');
   if (!sw) return;
   document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
   sw.classList.add('active');
   myColor = sw.dataset.color;
-};
-
-// Botões criar e entrar (simplificados para teste)
-document.getElementById('btn-create').onclick = () => {
-  myRole = 'p1';
-  phys.p1.name = myName;
-  phys.p1.color = myColor;
-  roomCode = Math.random().toString(36).slice(2,6).toUpperCase();
-  document.getElementById('cj-card').style.display = 'none';
-  document.getElementById('wait-card').style.display = 'block';
-  document.getElementById('disp-code').textContent = roomCode;
-  startGame();
-};
-
-document.getElementById('btn-join').onclick = () => {
-  myRole = 'p2';
-  phys.p2.name = myName;
-  phys.p2.color = myColor;
-  startGame();
-};
-
-document.getElementById('btn-copy').onclick = () => {
-  navigator.clipboard.writeText(roomCode);
-  alert("Código copiado!");
-};
+});
 </script>
 </body>
 </html>
